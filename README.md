@@ -48,7 +48,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 - \[2022.06.22\] Our paper is available on arXiv, click <a href="" target='_blank'>here</a> to check it out.
 
 
-## Overview
+## Outline
 
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
