@@ -40,7 +40,7 @@ LaserMix is a semi-supervised learning (SSL) framework designed for LiDAR semant
 </p>
 <br>
 
-Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a> to explore more details.
+Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a> to explore more details. 🚗
 
 
 ## Updates
