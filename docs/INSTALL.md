@@ -1,4 +1,4 @@
-<img src="../fig/logo.png" align="right" width="20%">
+<img src="../figs/logo.png" align="right" width="20%">
 
 # Installation
 
