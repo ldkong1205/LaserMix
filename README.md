@@ -50,9 +50,9 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Overview
 
-- [Installation](docs/INSTALL.md)
-- [Data Preparation](docs/DATA_PREPARE.md)
-- [Getting Started](docs/GET_STARTED.md)
+- [Installation](#installation)
+- [Data Preparation](#data-preparation)
+- [Getting Started](#getting-started)
 - [Main Results](#main-results)
 - [TODO List](#todo-list)
 - [License](#license)
