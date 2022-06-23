@@ -30,7 +30,7 @@
 
 ## About
 
-LaserMix is a semi-supervised learning (SSL) framework designed for LiDAR semantic segmentation. It leverages the strong <strong>spatial prior</strong> of driving scenes to construct <strong>low-variation areas</strong> via <strong>laser beam mixing</strong>, and encourages segmentation models to make <strong>confident</strong> and <strong>consistent</strong> predictions before and after mixing.
+<strong>LaserMix</strong> is a semi-supervised learning (SSL) framework designed for LiDAR semantic segmentation. It leverages the strong <strong>spatial prior</strong> of driving scenes to construct <strong>low-variation areas</strong> via <strong>laser beam mixing</strong>, and encourages segmentation models to make <strong>confident</strong> and <strong>consistent</strong> predictions before and after mixing.
 
 <br>
 <p align="center">
@@ -172,7 +172,7 @@ We would like to thank <a href="https://scholar.google.com/citations?user=mhaiL5
 
 If you find this work helpful, please kindly consider citing our paper:
 
-```
+```bibtex
 @ARTICLE{kong2022lasermix,
   title={LaserMix for Semi-Supervised LiDAR Semantic Segmentation},
   author={Kong, Lingdong and Ren, Jiawei and Pan, Liang and Liu, Ziwei},
