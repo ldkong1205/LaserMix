@@ -165,7 +165,7 @@ This work is under the <a rel="license" href="http://creativecommons.org/license
 ## Acknowledgement
 We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>8</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>9</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>10</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>11</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>12</sup>[CBST](https://github.com/yzou2/CBST), <sup>13</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>14</sup>[Cityscapes](https://www.cityscapes-dataset.com).
 
-We would like to thank <a href="https://scholar.google.com/citations?user=mhaiL5MAAAAJ" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
+We would like to thank <a href="https://hongfz16.github.io/" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
 
 
 ## Citation
