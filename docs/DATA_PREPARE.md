@@ -62,7 +62,7 @@ To install the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, downlo
 
 
 ```
-└── semantickitti  
+└── scribblekitti 
     └── dataset
         └── scribbles <- contains the .label files; a .label file contains the scribble labels of the points in a point cloud
              └── 00
