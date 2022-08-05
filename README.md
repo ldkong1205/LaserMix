@@ -73,6 +73,13 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 
 ## Main Results
+#### Framework Overview
+
+<p align="center">
+  <img src="figs/framework.png" align="center" width="99.9%">
+</p>
+
+
 #### Range View
 
 <table>
@@ -140,6 +147,12 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
       <td><sup>+</sup><small>5.0</small></td> <td><sup>+</sup><small>5.7</small></td> <td><sup>+</sup><small>3.0</small></td> <td><sup>+</sup><small>3.0</small></td>
    </tr>
 </table>
+
+#### Ablation Studies
+
+<p align="center">
+  <img src="figs/ablation.png" align="center" width="99.9%">
+</p>
 
 #### Qualitative Examples
 
