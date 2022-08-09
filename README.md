@@ -2,9 +2,10 @@
 <p align="center">
   <img src="figs/logo.png" align="center" width="30%">
 
+  
+  <h3 align="center"><strong>LaserMix for Semi-Supervised LiDAR Semantic Segmentation</strong></h3>
+  
   <p align="center">
-  <strong>LaserMix for Semi-Supervised LiDAR Semantic Segmentation</strong>
-    <br>
       <a href="https://scholar.google.com/citations?user=-j1j7TkAAAAJ" target='_blank'>Lingdong Kong</a>,&nbsp;
       <a href="https://scholar.google.com/citations?user=YUKPVCoAAAAJ" target='_blank'>Jiawei Ren</a>,&nbsp;
       <a href="https://scholar.google.com/citations?user=lSDISOcAAAAJ" target='_blank'>Liang Pan</a>,&nbsp;
@@ -20,7 +21,7 @@
   </a>
   
   <a href="https://ldkong.com/LaserMix" target='_blank'>
-    <img src="https://img.shields.io/badge/Project-%F0%9F%8E%AC-yellow">
+    <img src="https://img.shields.io/badge/Project-%F0%9F%94%97-yellow">
   </a>
   
   <a href="https://zhuanlan.zhihu.com/p/528689803" target='_blank'>
