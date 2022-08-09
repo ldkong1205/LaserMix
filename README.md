@@ -46,7 +46,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
-- \[2022.07.03\] Our paper is available on arXiv, click <a href="https://arxiv.org/abs/2207.00026" target='_blank'>here</a> to check it out. Code will be available soon!
+- \[2022.07\] - Our paper is available on arXiv, click <a href="https://arxiv.org/abs/2207.00026" target='_blank'>here</a> to check it out. Code will be available soon!
 
 
 ## Outline
@@ -162,8 +162,10 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 ## TODO List
 
-- [x] Initial release. 🚀
+- [x] Initial release. :rocket:
 - [x] Add license. See [here](#license) for more details.
+- [x] Add visualization video. :movie_camera:
+- [ ] Add demo at Hugging Face Spaces. :hugs:
 - [ ] Add installation details.
 - [ ] Add data preparation details.
 - [ ] Add evaluation details.
