@@ -46,6 +46,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
+- \[2022.08\] - We provide a [video demo](https://www.youtube.com/watch?v=LKzBqtmxXLg) for visual comparisons on the SemanticKITTI val set. Take a look!
 - \[2022.07\] - Our paper is available on arXiv, click <a href="https://arxiv.org/abs/2207.00026" target='_blank'>here</a> to check it out. Code will be available soon!
 
 
@@ -59,7 +60,6 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 - [License](#license)
 - [Acknowledgement](#acknowledgement)
 - [Citation](#citation)
-
 
 ## Installation
 Please refer to [INSTALL.md](docs/INSTALL.md) for the installation details.
