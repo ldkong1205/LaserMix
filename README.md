@@ -55,6 +55,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 - [Installation](#installation)
 - [Data Preparation](#data-preparation)
 - [Getting Started](#getting-started)
+- [Video Demo](#video-demo)
 - [Main Results](#main-results)
 - [TODO List](#todo-list)
 - [License](#license)
@@ -73,15 +74,23 @@ Please refer to [DATA_PREPARE.md](docs/DATA_PREPARE.md) for the details to prepa
 Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about this codebase.
 
 
+## Video Demo
+<p>
+<a href="https://www.youtube.com/watch?v=LKzBqtmxXLg">
+<img width="70%" src="figs/demo-cover.png">
+</a>
+</p>
+
+
 ## Main Results
-#### Framework Overview
+### Framework Overview
 
 <p align="center">
   <img src="figs/framework.png" align="center" width="99.9%">
 </p>
 
 
-#### Range View
+### Range View
 
 <table>
    <tr>
@@ -115,7 +124,7 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
    </tr>
 </table>
 
-#### Voxel
+### Voxel
 
 <table>
    <tr>
@@ -149,13 +158,13 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
    </tr>
 </table>
 
-#### Ablation Studies
+### Ablation Studies
 
 <p align="center">
   <img src="figs/ablation.png" align="center" width="99.9%">
 </p>
 
-#### Qualitative Examples
+### Qualitative Examples
 
 ![qualitative](figs/qualitative.png)
 
