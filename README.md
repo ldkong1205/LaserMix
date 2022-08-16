@@ -75,9 +75,9 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 
 ## Video Demo
-<p>
+<p align="center">
 <a href="https://www.youtube.com/watch?v=LKzBqtmxXLg">
-<img width="70%" src="figs/demo-cover.png">
+<img width="80%" src="figs/demo-cover.png">
 </a>
 </p>
 
