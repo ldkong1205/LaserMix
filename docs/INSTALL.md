@@ -4,17 +4,23 @@
 
 ### General Requirements
 
-Coming soon.
+This codebase is tested with `torch==1.10.1` and `torchvision==0.11.2`, with `CUDA 11.3`. In order to successfully reproduce the results reported in our paper, we recommend you to follow the exact same versions. However, similar versions that came out lately should be good as well.
 
 ### Range View
 
-Coming soon.
+For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x2048` for SemanticKITTI/ScribbleKITTI.
 
 
 ### Voxel
-For the **voxel option**, we use a more compact version of [Cylinder3D](https://github.com/xinge008/Cylinder3D) as the segmentation backbone. It contains 28.13M parameters (compared to 56.26M for the one used in the [original paper](https://arxiv.org/abs/2011.10033)). We also use a smaller voxel resolution [240, 180, 20] compared to the original configuration [480, 360, 32]. This saves around 4x memory consumption and further helps to speed up training.
+For the **voxel option**, we use a more compact version of [Cylinder3D](https://github.com/xinge008/Cylinder3D) as the LiDAR segmentation backbone. It contains `28.13M` parameters (compared to 56.26M for the one used in the [original paper](https://arxiv.org/abs/2011.10033)). We also use a smaller voxel resolution `[240, 180, 20]` compared to the original configuration `[480, 360, 32]`. This saves around 4x memory consumption and further helps to speed up training.
 
 #### Requirements
 - [torch-scatter](https://github.com/rusty1s/pytorch_scatter)
 - [spconv](https://github.com/traveller59/spconv/tree/v1.2.1) (v1.2.1)
 - [pybind11](https://github.com/pybind/pybind11/tree/085a29436a8c472caaaf7157aa644b571079bcaa)
+
+
+### Step 1: Create Enviroment
+```
+conda create -n lasermix python=3.9
+```
