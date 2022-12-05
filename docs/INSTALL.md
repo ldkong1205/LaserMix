@@ -4,11 +4,11 @@
 
 ### General Requirements
 
-This codebase is tested with `torch==1.10.1` and `torchvision==0.11.2`, with `CUDA 11.3`. In order to successfully reproduce the results reported in our paper, we recommend you to follow the exact same versions. However, similar versions that came out lately should be good as well.
+This codebase is tested with `torch==1.10.1` and `torchvision==0.11.2`, with `CUDA 11.3`. In order to successfully reproduce the results reported in our paper, we recommend you to follow the exact same configuation with us. However, similar versions that came out lately should be good as well.
 
 ### Range View
 
-For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x2048` for SemanticKITTI/ScribbleKITTI.
+For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x2048` for SemanticKITTI and ScribbleKITTI.
 
 
 ### Voxel
@@ -24,3 +24,14 @@ For the **voxel option**, we use a more compact version of [Cylinder3D](https://
 ```
 conda create -n lasermix python=3.9
 ```
+
+### Step 2: Activate Enviroment
+```
+conda activate lasermix
+```
+
+### Step 3: Install PyTorch
+```
+conda install pytorch==1.10.1 torchvision==0.11.2 cudatoolkit=11.3 -c pytorch -c conda-forge
+```
+
