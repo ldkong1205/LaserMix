@@ -134,7 +134,7 @@ def train(logger, model, datasets, args, cfg):
 
         model.train()
 
-        for idx, (scan, label, _, name) in enumerate(loader_train):
+        for idx, (scan, label, _, _) in enumerate(loader_train):
 
             optimizer.zero_grad()
             lr = scheduler.get_last_lr()[0]
@@ -163,9 +163,12 @@ def train(logger, model, datasets, args, cfg):
                     pixel_losses, _ = torch.topk(pixel_losses, top_k_pixels)
                     loss_ce = pixel_losses.mean()
                 
-                loss_ls = LS(F.softmax(logits, dim=1), label)
+                if cfg.OPTIM.IF_LS_LOSS:
+                    loss_ls = LS(F.softmax(logits, dim=1), label)
+                else:
+                    loss_ls = 0.
 
-                if args.if_bd_loss:
+                if cfg.OPTIM.IF_BD_LOSS:
                     loss_bd = BD(F.softmax(logits, dim=1), label)
                 else:
                     loss_bd = 0.

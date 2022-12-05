@@ -105,16 +105,16 @@ class SemanticHead(nn.Module):
 
         self.semantic_output=nn.Conv2d(128, num_class, 1)
 
-    def forward(self, input_tensor):    # [bs, 1024, 64, 512]
-        res=self.conv_1(input_tensor)   # [bs, 512, 64, 512]
+    def forward(self, input_tensor):
+        res=self.conv_1(input_tensor)   # [bs, 512, H, W]
         res=self.bn1(res)
         res=self.relu_1(res)
         
-        res=self.conv_2(res)            # [bs, 128, 64, 512]
+        res=self.conv_2(res)            # [bs, 128, H, W]
         res=self.bn2(res)
         res=self.relu_2(res)
         
-        res=self.semantic_output(res)   # [bs, cls, 64, 512]
+        res=self.semantic_output(res)   # [bs, cls, H, W]
         return res
 
 
