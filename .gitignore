@@ -6,6 +6,8 @@ downloads/
 env/
 lib/
 lib64/
+log/
+logs/
 
 .cache
 .env
@@ -19,4 +21,3 @@ lib64/
 *.egg-info/
 *.log
 *.pth
-*.txt

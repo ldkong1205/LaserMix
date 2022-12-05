@@ -1,0 +1,37 @@
+# TRAINING CONFIG
+EXP_NAME: 'range.sup_only'
+SUFFIX: ''
+
+DATA:
+    DATASET: 'nuscenes'  # option: ['nuscenes', 'semantickitti', 'scribblekitti']
+    SPLIT: '1pct'  # option: ['1pct', '10pct', '20pct', '50pct']
+
+MODEL:
+    MODALITY: 'range'  # option: ['range', 'voxel']
+    RESOLUTION:
+        NUSCENES: [32, 1920]
+        SEMANTICKITTI: [64, 2048]
+        SCRIBBLEKITTI: [64, 2048]
+
+TRAIN:
+    NUM_EPOCHS: 50
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
+
+VALID:
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
+
+OPTIM:
+    LOSS: 'dice'  # option: ['wce', 'dice']
+    IF_LS_LOSS: True
+    IF_BD_LOSS: True
+    TOP_K_PERCENT_PIXELS: 1.0
+    OPTIMIZER: 'adamw'  # option: ['adamw', 'sgd']
+    LEARNING_RATE: 0.0025
+    SCHEDULER: 'onecycle'  # option: ['onecycle', 'step']
+
+GENERAL:
+    SEED: 1205
+
+
