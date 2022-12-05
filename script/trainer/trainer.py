@@ -218,39 +218,42 @@ def train(logger, model, datasets, args, cfg):
                     )
                 )
 
-            if epoch >= args.epoch_start_val:
+            if idx == 1: break
 
-                # validation
-                loss, acc, iou = validate(
-                    logger=logger,
-                    loader_val=loader_val,
-                    evaluator=evaluator,
-                    model=model,
-                    criterion=[WCE, LS],
-                    info=info,
-                    args=args
-                )
+        if epoch >= cfg.VALID.EPOCH_START_VAL:
 
-                logger.info("*" * 80)
+            # validation
+            loss, acc, iou = validate(
+                logger=logger,
+                loader_val=loader_val,
+                evaluator=evaluator,
+                model=model,
+                criterion=[WCE, LS],
+                info=info,
+                args=args,
+                cfg=cfg,
+            )
 
-                # update info
-                info["valid_loss"] = loss
-                info["valid_acc"]  = acc
-                info["valid_iou"]  = iou
+            logger.info("*" * 80)
 
-                logger.info("Current mIoU is '{:.1f}'%, while the previous best mIoU is '{:.1f}'%.".format(
-                    info["valid_iou"] * 100, info['best_val_iou'] * 100)
-                )
+            # update info
+            info["valid_loss"] = loss
+            info["valid_acc"]  = acc
+            info["valid_iou"]  = iou
 
-                if info['valid_iou'] > info['best_val_iou']:
-                    info['best_val_iou'] = info['valid_iou']
+            logger.info("Current mIoU is '{:.1f}'%, while the previous best mIoU is '{:.1f}'%.".format(
+                info["valid_iou"] * 100, info['best_val_iou'] * 100)
+            )
 
-                    # save checkpoint
-                    logger.info('Taking snapshot ...')
-                    torch.save(model.state_dict(), os.path.join(args.log_dir, 'best_so_far') + '.pth')
+            if info['valid_iou'] > info['best_val_iou']:
+                info['best_val_iou'] = info['valid_iou']
 
-                # switch back to train mode
-                model.train()
+                # save checkpoint
+                logger.info('Taking snapshot ...')
+                torch.save(model.state_dict(), os.path.join(args.log_dir, 'best_so_far') + '.pth')
+
+            # switch back to train mode
+            model.train()
 
         # update info
         info["train_loss"] = meter_loss.avg

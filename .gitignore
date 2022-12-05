@@ -21,3 +21,4 @@ logs/
 *.egg-info/
 *.log
 *.pth
+*.sh

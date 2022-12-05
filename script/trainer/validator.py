@@ -36,7 +36,7 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg):
     # val steps start here
     with torch.no_grad():
 
-        for idx, (scan, label, _, name) in enumerate(loader_val):
+        for idx, (scan, label, _, _) in enumerate(loader_val):
 
             bs = scan.size(0)
             scan  = scan.cuda()  # [bs, 6, H, W]
@@ -62,6 +62,8 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg):
             meter_loss.update(loss.mean().item(), bs)
             meter_jacc.update(jacc.mean().item(), bs)
             meter_wce.update(wce.mean().item(), bs)
+
+            if idx == 1: break
 
         accuracy = evaluator.getacc()
         jaccard, class_jaccard = evaluator.getIoU()

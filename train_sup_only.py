@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/range.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -29,7 +29,7 @@ def get_args():
     # -- for nuScenes --
     parser.add_argument('--root_nusc', type=str, 
                         help='file root path for the nuScenes databas.', default='/nvme/share/data/sets/nuScenes')
-    parser.add_argument('--horiz_angular_res', type=float, choices=[0.1875, 0.375],
+    parser.add_argument('--horiz_angular_res', type=float,
                         help='resolution of horizontal angular.', default=0.1875)
     # -- for SemanticKITTI --
     parser.add_argument('--root_semkitti', type=str, 
@@ -70,12 +70,12 @@ def main():
     torch.backends.cudnn.benchmark = True
 
     # set logger
-    log_dir = os.path.join(args.log_dir, cfg.EXP_NAME + cfg.SUFFIX, cfg.DATA.DATASET + '_' + cfg.DATA.SPLIT)
-    if not(os.path.exists(log_dir)):
-        os.makedirs(log_dir)
+    args.log_dir = os.path.join(args.log_dir, cfg.EXP_NAME + cfg.SUFFIX, cfg.DATA.DATASET + '_' + cfg.DATA.SPLIT)
+    if not(os.path.exists(args.log_dir)):
+        os.makedirs(args.log_dir)
 
     timestamp = time.strftime('%Y%m%d_%H%M%S', time.localtime())
-    logging.basicConfig(level=logging.INFO, filename=os.path.join(log_dir, f'{timestamp}.log'))
+    logging.basicConfig(level=logging.INFO, filename=os.path.join(args.log_dir, f'{timestamp}.log'))
     logger = logging.getLogger()
 
     logger.info(' '.join(f'{k}={v}\n' for k, v in vars(args).items()))
@@ -119,17 +119,17 @@ def main():
         datasets = [
             SemkittiLidarSegDatabase(
                 args.root_semkitti, 'train', (args.H, args.W),
-                if_global_drop=args.if_global_drop,
-                if_flip_sign=args.if_flip_sign,
-                if_scale=args.if_scale,
-                if_rotate=args.if_rotate,
-                if_jitter=args.if_jitter,
+                if_drop=True,
+                if_flip=True,
+                if_scale=True,
+                if_rotate=True,
+                if_jitter=True,
                 if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
             ),
             SemkittiLidarSegDatabase(
                 args.root_semkitti, 'val', (args.H, args.W),
-                if_global_drop=False,
-                if_flip_sign=False,
+                if_drop=False,
+                if_flip=False,
                 if_scale=False,
                 if_rotate=False,
                 if_jitter=False,

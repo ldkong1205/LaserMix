@@ -12,46 +12,35 @@ from torchvision.transforms import functional as F
 from data.semantickitti.laserscan import SemLaserScan
 
 
-class SemkittiRangeViewDataset(data.Dataset):
+class SemkittiLidarSegDatabase(data.Dataset):
     
     def __init__(
         self,
-        dataset_cfg = None,
-        class_names: list = None,
-        training: bool = True,
-        root_path: bool = None,
-        logger = None,
+        root: str,
+        split: str,
+        range_img_size: tuple = (64, 2048),
+        if_range_mask: bool = False,
+        if_drop: bool = False,
+        if_flip: bool = False,
+        if_scale: bool = False,
+        if_rotate: bool = False,
+        if_jitter: bool = False,
+        if_scribble: bool = False,
     ):
-        self.dataset_cfg = dataset_cfg
-        self.training = training
-        self.class_names = class_names
-        self.root = root_path if root_path is not None else self.dataset_cfg.DATA_PATH
-        self.logger = logger
-        self.split = self.dataset_cfg.DATA_SPLIT['train'] if self.training else self.dataset_cfg.DATA_SPLIT['test']
-        self.H, self.W = self.dataset_cfg.H, self.dataset_cfg.W  # (H, W)
-        yaml_file_path = 'pcdet/datasets_seg/SemanticKITTI/semantickitti.yaml'
+        self.root = root
+        self.split = split
+        self.H, self.W = range_img_size  # (H, W)
+        yaml_file_path = 'data/semantickitti/semantickitti.yaml'
         self.CFG = yaml.safe_load(open(yaml_file_path, 'r'))
         self.color_dict = self.CFG["color_map"]
         self.label_transfer_dict = self.CFG["learning_map"]  # label mapping
         self.nclasses = len(self.color_dict)  # 34
 
-        # common aug
-        self.if_drop = False if not self.training else self.dataset_cfg.IF_DROP
-        self.if_flip = False if not self.training else self.dataset_cfg.IF_FLIP
-        self.if_scale = False if not self.training else self.dataset_cfg.IF_SCALE
-        self.if_rotate = False if not self.training else self.dataset_cfg.IF_ROTATE
-        self.if_jitter = False if not self.training else self.dataset_cfg.IF_JITTER
-
-        # range aug
-        self.if_range_mix = False if not self.training else self.dataset_cfg.IF_RANGE_MIX
-        self.if_range_shift = False if not self.training else self.dataset_cfg.IF_RANGE_SHIFT
-        self.if_range_paste = False if not self.training else self.dataset_cfg.IF_RANGE_PASTE
-        self.instance_list = [
-            'bicycle', 'motorcycle', 'truck' 'other-vehicle', 
-            'person', 'bicyclist', 'motorcyclist', 'other-ground', 
-            'trunk', 'pole', 'traffic-sign'
-        ]
-        self.if_range_union = False if not self.training else self.dataset_cfg.IF_RANGE_UNION
+        self.if_drop = if_drop
+        self.if_flip = if_flip
+        self.if_scale = if_scale
+        self.if_rotate = if_rotate
+        self.if_jitter = if_jitter
 
         self.A=SemLaserScan(
             nclasses = self.nclasses,
@@ -66,16 +55,11 @@ class SemkittiRangeViewDataset(data.Dataset):
             if_scale = self.if_scale,
             if_rotate = self.if_rotate,
             if_jitter = self.if_jitter,
-            if_range_mix = self.if_range_mix,
-            if_range_paste=self.if_range_paste,
-            if_range_union=self.if_range_union,
         )
 
         if self.split == 'train': folders = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
         elif self.split == 'val': folders = ['08']
         elif self.split == 'test': folders = ['11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
-        elif self.split == 'train_test': folders = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
-        elif self.split == 'train_val_test': folders = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
 
         self.lidar_list = []
         for folder in folders:
@@ -84,13 +68,6 @@ class SemkittiRangeViewDataset(data.Dataset):
 
         self.label_list = [i.replace("velodyne", "labels") for i in self.lidar_list]
         self.label_list = [i.replace("bin", "label") for i in self.label_list]
-
-        if self.split == 'train_test':
-            root_psuedo_labels = '/mnt/lustre/konglingdong/data/sets/sequences/'
-            folders_test = ['11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
-            for i in self.label_list:
-                if i.split('sequences/')[1][:2] in folders_test:
-                    i.replace(self.root + 'sequences/', root_psuedo_labels)
 
         print("Loading '{}' labels from SemanticKITTI under '{}' split.\n".format(len(self.label_list), self.split))
 
@@ -101,7 +78,6 @@ class SemkittiRangeViewDataset(data.Dataset):
         self.A.open_scan(self.lidar_list[index])
         self.A.open_label(self.label_list[index])
 
-        # prepare attributes
         dataset_dict = {}
 
         dataset_dict['xyz'] = self.A.proj_xyz
@@ -113,77 +89,12 @@ class SemkittiRangeViewDataset(data.Dataset):
         semantic_train_label = self.generate_label(semantic_label)
         dataset_dict['semantic_label'] = semantic_train_label
 
-        # data aug (range shift)
-        if np.random.random() >= (1 - self.if_range_shift):
-            split_point = random.randint(100, self.W-100)
-            dataset_dict = self.sample_transform(dataset_dict, split_point)
+        split_point = random.randint(100, self.W-100)
+        dataset_dict = self.sample_transform(dataset_dict, split_point)
 
         scan, label, mask = self.prepare_input_label_semantic_with_mask(dataset_dict)
 
-        if self.if_range_mix > 0 or self.if_range_paste > 0 or self.if_range_union > 0:
-
-            idx = np.random.randint(0, len(self.lidar_list))
-
-            self.A.open_scan(self.lidar_list[idx])
-            self.A.open_label(self.label_list[idx])
-
-            dataset_dict_ = {}
-            dataset_dict_['xyz'] = self.A.proj_xyz
-            dataset_dict_['intensity'] = self.A.proj_remission
-            dataset_dict_['range_img'] = self.A.proj_range
-            dataset_dict_['xyz_mask'] = self.A.proj_mask
-
-            semantic_label = self.A.proj_sem_label
-            semantic_train_label = self.generate_label(semantic_label)
-            dataset_dict_['semantic_label'] = semantic_train_label
-
-            # data aug (range shift)
-            if np.random.random() >= (1 - self.if_range_shift):
-                split_point_ = random.randint(100, self.W-100)
-                dataset_dict_ = self.sample_transform(dataset_dict_, split_point_)
-
-            scan_, label_, mask_ = self.prepare_input_label_semantic_with_mask(dataset_dict_)
-
-            # data aug (range mix)
-            if np.random.random() >= (1 - self.if_range_mix):
-                scan_mix1, label_mix1, mask_mix1, scan_mix2, label_mix2, mask_mix2, s = self.BeamMix.forward(scan, label, mask, scan_, label_, mask_)
-
-                if np.random.random() >= 0.5:
-                    scan, label, mask = scan_mix1, label_mix1, mask_mix1
-                else:
-                    scan, label, mask = scan_mix2, label_mix2, mask_mix2
-
-            # data aug (range paste)
-            if np.random.random() >= (1 - self.if_range_paste):
-                scan, label, mask = self.RangePaste(scan, label, mask, scan_, label_, mask_)
-
-            # data aug (range union)
-            if np.random.random() >= (1 - self.if_range_union):
-                scan, label, mask = self.RangeUnion(scan, label, mask, scan_, label_, mask_)
-
-        data_dict = {
-            'scan_rv': F.to_tensor(scan),
-            'label_rv': F.to_tensor(label).to(dtype=torch.long),
-            'mask_rv': F.to_tensor(mask),
-            'scan_name': self.lidar_list[index],
-        }
-
-        return data_dict
-
-        # return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
-
-
-    def RangeUnion(self, scan, label, mask, scan_, label_, mask_):
-        pix_empty = mask == 0
-
-        scan_new = scan.copy()
-        label_new = label.copy()
-        mask_new = mask.copy()
-
-        scan_new[pix_empty]  = scan_[pix_empty]
-        label_new[pix_empty] = label_[pix_empty]
-        mask_new[pix_empty]  = mask_[pix_empty]
-        return scan_new, label_new, mask_new
+        return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
 
 
     def RangePaste(self, scan, label, mask, scan_, label_, mask_):
@@ -314,7 +225,6 @@ class SemkittiRangeViewDataset(data.Dataset):
 
 
     def fill_spherical(self,range_image):
-        # fill in spherical image for calculating normal vector
         height,width=np.shape(range_image)[:2]
         value_mask=np.asarray(1.0-np.squeeze(range_image)>0.1).astype(np.uint8)
         dt, lbl = cv2.distanceTransformWithLabels(value_mask, cv2.DIST_L1, 5, labelType=cv2.DIST_LABEL_PIXEL)
