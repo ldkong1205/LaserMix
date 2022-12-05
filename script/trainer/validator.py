@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from script.evaluator.avgmeter import AverageMeter
 
 
-def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg):
+def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, device):
 
     # set meta info
     meter_loss = AverageMeter()
@@ -39,8 +39,8 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg):
         for idx, (scan, label, _, _) in enumerate(loader_val):
 
             bs = scan.size(0)
-            scan  = scan.cuda()  # [bs, 6, H, W]
-            label = torch.squeeze(label, axis=1).cuda()  # [bs, H, W]
+            scan  = scan.to(device)  # [bs, 6, H, W]
+            label = torch.squeeze(label, axis=1).to(device)  # [bs, H, W]
 
             with torch.cuda.amp.autocast(enabled=args.amp):
 
@@ -62,8 +62,6 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg):
             meter_loss.update(loss.mean().item(), bs)
             meter_jacc.update(jacc.mean().item(), bs)
             meter_wce.update(wce.mean().item(), bs)
-
-            if idx == 1: break
 
         accuracy = evaluator.getacc()
         jaccard, class_jaccard = evaluator.getIoU()

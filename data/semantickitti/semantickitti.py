@@ -19,6 +19,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
         root: str,
         split: str,
         range_img_size: tuple = (64, 2048),
+        data_split: str = None,
         if_range_mask: bool = False,
         if_drop: bool = False,
         if_flip: bool = False,
@@ -26,6 +27,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
         if_rotate: bool = False,
         if_jitter: bool = False,
         if_scribble: bool = False,
+        if_sup_only: bool = False,
     ):
         self.root = root
         self.split = split
@@ -36,6 +38,24 @@ class SemkittiLidarSegDatabase(data.Dataset):
         self.label_transfer_dict = self.CFG["learning_map"]  # label mapping
         self.nclasses = len(self.color_dict)  # 34
 
+        if data_split == 'full':
+            self.data_split_list_path = None
+        elif data_split == '1pct':
+            self.data_split_list_path = 'script/split/semantickitti/semantickitti_1pct.txt'
+        elif data_split == '10pct':
+            self.data_split_list_path = 'script/split/semantickitti/semantickitti_10pct.txt'
+        elif data_split == '20pct':
+            self.data_split_list_path = 'script/split/semantickitti/semantickitti_20pct.txt'
+        elif data_split == '50pct':
+            self.data_split_list_path = 'script/split/semantickitti/semantickitti_50pct.txt'
+        else:
+            raise NotImplementedError
+
+        if self.data_split_list_path:
+            with open(self.data_split_list_path, "r") as f:
+                data_split_list = f.read().splitlines()
+            data_split_list = [i.split('train/')[-1] for i in data_split_list]
+        
         self.if_drop = if_drop
         self.if_flip = if_flip
         self.if_scale = if_scale
@@ -63,13 +83,26 @@ class SemkittiLidarSegDatabase(data.Dataset):
 
         self.lidar_list = []
         for folder in folders:
-            self.lidar_list += glob.glob(self.root + 'sequences/' + folder + '/velodyne/*.bin') 
-        print("Loading '{}' samples from SemanticKITTI under '{}' split".format(len(self.lidar_list), self.split))
-
+            self.lidar_list += glob.glob(self.root + 'sequences/' + folder + '/velodyne/*.bin')
         self.label_list = [i.replace("velodyne", "labels") for i in self.lidar_list]
         self.label_list = [i.replace("bin", "label") for i in self.label_list]
 
-        print("Loading '{}' labels from SemanticKITTI under '{}' split.\n".format(len(self.label_list), self.split))
+        if self.data_split_list_path:
+            self.lidar_list_labeled = [self.root + 'sequences/' + i for i in data_split_list]
+            self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
+            self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
+            print("Loading '{}' labeled samples from SemanticKITTI under '{}' split ...".format(len(self.lidar_list_labeled), self.split))
+
+            if not if_sup_only:
+                self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
+                self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
+                self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
+                print("Loading '{}' unlabeled samples from SemanticKITTI under '{}' split ...".format(len(self.lidar_list_unlabeled), self.split))
+
+                self.lidar_list_labeled = self.lidar_list_labeled * int(np.ceil(len(self.lidar_list_unlabeled) / len(self.lidar_list_labeled)))
+
+            self.lidar_list = self.lidar_list_labeled
+            self.label_list = self.label_list_labeled
 
     def __len__(self):
         return len(self.lidar_list)

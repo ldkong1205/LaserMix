@@ -67,6 +67,7 @@ def main():
     set_random_seed(cfg.GENERAL.SEED, deterministic=args.deterministic)
 
     # set device
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     torch.backends.cudnn.benchmark = True
 
     # set logger
@@ -119,21 +120,25 @@ def main():
         datasets = [
             SemkittiLidarSegDatabase(
                 args.root_semkitti, 'train', (args.H, args.W),
+                data_split=cfg.DATA.SPLIT,
                 if_drop=True,
                 if_flip=True,
                 if_scale=True,
                 if_rotate=True,
                 if_jitter=True,
                 if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
+                if_sup_only=cfg.DATA.IF_SUP_ONLY,
             ),
             SemkittiLidarSegDatabase(
                 args.root_semkitti, 'val', (args.H, args.W),
+                data_split='full',
                 if_drop=False,
                 if_flip=False,
                 if_scale=False,
                 if_rotate=False,
                 if_jitter=False,
                 if_scribble=False,
+                if_sup_only=cfg.DATA.IF_SUP_ONLY,
             ),
         ]
     
@@ -155,7 +160,7 @@ def main():
     logger.info("Model parameters: '{:.3f} M".format(get_n_params(model)/1e6))
 
     # turn to trainer
-    train(logger, model, datasets, args, cfg)
+    train(logger, model, datasets, args, cfg, device)
 
 if __name__ == '__main__':
     main()

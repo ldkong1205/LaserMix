@@ -3,8 +3,9 @@ import torch
 
 
 class iouEval:
-    def __init__(self, n_classes:int, ignore:int = 0):
+    def __init__(self, device, n_classes:int, ignore:int = 0):
         self.n_classes = n_classes
+        self.device = device
         self.ignore = torch.tensor(ignore).long()
         self.include = torch.tensor([n for n in range(self.n_classes) if n not in self.ignore]).long()
         print("[IOU EVAL] IGNORED CLASS: ", self.ignore)
@@ -15,15 +16,15 @@ class iouEval:
         return self.n_classes
 
     def reset(self):
-        self.conf_matrix = torch.zeros((self.n_classes, self.n_classes)).long().cuda()
+        self.conf_matrix = torch.zeros((self.n_classes, self.n_classes), device=self.device).long()
         self.ones = None
         self.last_scan_size = None
 
     def addBatch(self, x, y):
         if isinstance(x, np.ndarray):
-            x = torch.from_numpy(np.array(x)).long().cuda()
+            x = torch.from_numpy(np.array(x)).long().to(self.device)
         if isinstance(y, np.ndarray):
-            y = torch.from_numpy(np.array(y)).long().cuda()
+            y = torch.from_numpy(np.array(y)).long().to(self.device)
 
         x_row = x.reshape(-1)
         y_row = y.reshape(-1)
@@ -31,7 +32,7 @@ class iouEval:
         idxs = torch.stack([x_row, y_row], dim=0)
 
         if self.ones is None or self.last_scan_size != idxs.shape[-1]:
-            self.ones = torch.ones((idxs.shape[-1])).long().cuda()
+            self.ones = torch.ones((idxs.shape[-1]), device=self.device).long()
             self.last_scan_size = idxs.shape[-1]
 
         self.conf_matrix = self.conf_matrix.index_put_(

@@ -9,7 +9,7 @@ from script.evaluator.avgmeter import AverageMeter
 from script.evaluator.ioueval import iouEval
 
 
-def train(logger, model, datasets, args, cfg):
+def train(logger, model, datasets, args, cfg, device):
 
     # set train loader
     datasets = datasets if isinstance(datasets, (list, tuple)) else [datasets]
@@ -86,18 +86,18 @@ def train(logger, model, datasets, args, cfg):
     top_k_percent_pixels = cfg.OPTIM.TOP_K_PERCENT_PIXELS
     
     if cfg.OPTIM.LOSS == 'wce':
-        weight = torch.tensor(ClassWeightSemikitti.get_weight()).cuda()
-        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=weight).cuda()
+        weight = torch.tensor(ClassWeightSemikitti.get_weight()).to(device)
+        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=weight).to(device)
     elif cfg.OPTIM.LOSS == 'dice':
-        WCE = CrossEntropyDiceLoss(reduction='none', weight=None).cuda()
+        WCE = CrossEntropyDiceLoss(reduction='none', weight=None).to(device)
     else:
         raise NotImplementedError
     
     if cfg.OPTIM.IF_LS_LOSS:
-        LS = Lovasz_softmax(ignore=0).cuda()
+        LS = Lovasz_softmax(ignore=0).to(device)
     
     if cfg.OPTIM.IF_BD_LOSS:
-        BD = BoundaryLoss().cuda()
+        BD = BoundaryLoss().to(device)
 
     # set running info
     info = {"train_loss": 0, "train_acc": 0, "train_iou": 0,
@@ -106,21 +106,21 @@ def train(logger, model, datasets, args, cfg):
     
     # set evaluator
     if cfg.DATA.DATASET == 'nuscenes':
-        evaluator = iouEval(n_classes=16+1, ignore=0)
+        evaluator = iouEval(device=device, n_classes=16+1, ignore=0)
     elif cfg.DATA.DATASET == 'semantickitti' or cfg.DATA.DATASET == 'scribblekitti':
-        evaluator = iouEval(n_classes=19+1, ignore=0)
+        evaluator = iouEval(device=device, n_classes=19+1, ignore=0)
     else:
         raise NotImplementedError
 
     # whether to resume
     if args.resume_from:
         logger.info("Loading epoch, model, optimizer, scaler, and scheduler states from '{}' ...".format(args.resume_from))
-        start_epoch = resume(args.resume_from, model, optimizer, scaler, scheduler, logger, args.amp)
+        start_epoch = resume(args.resume_from, model, optimizer, scaler, scheduler, logger, args.amp, device)
         start_epoch += 1
     else:
         start_epoch = 0
 
-    model = model.cuda()
+    model = model.to(device)
 
     # train/val steps start here
     for epoch in range(start_epoch, cfg.TRAIN.NUM_EPOCHS):
@@ -140,8 +140,8 @@ def train(logger, model, datasets, args, cfg):
             lr = scheduler.get_last_lr()[0]
             bs = scan.size(0)
             
-            scan  = scan.cuda()  # [bs, 6, H, W]
-            label = torch.squeeze(label, axis=1).cuda()  # [bs, H, W]
+            scan  = scan.to(device) # [bs, 6, H, W]
+            label = torch.squeeze(label, axis=1).to(device)  # [bs, H, W]
 
             with torch.cuda.amp.autocast(enabled=args.amp):
 
@@ -218,8 +218,6 @@ def train(logger, model, datasets, args, cfg):
                     )
                 )
 
-            if idx == 1: break
-
         if epoch >= cfg.VALID.EPOCH_START_VAL:
 
             # validation
@@ -232,6 +230,7 @@ def train(logger, model, datasets, args, cfg):
                 info=info,
                 args=args,
                 cfg=cfg,
+                device=device
             )
 
             logger.info("*" * 80)
@@ -296,7 +295,7 @@ def save_checkpoint(epoch, model, optimizer, scaler, scheduler, log_dir, amp):
     torch.save(checkpoint_state, name)
 
 
-def resume(resume_from, model, optimizer, scaler, scheduler, logger, amp):
+def resume(resume_from, model, optimizer, scaler, scheduler, logger, amp, device):
     if not os.path.isfile(resume_from):
         raise FileNotFoundError
 
@@ -308,7 +307,7 @@ def resume(resume_from, model, optimizer, scaler, scheduler, logger, amp):
     # model
     model_state_dict = checkpoint['model_state']
     model.load_state_dict(model_state_dict)
-    model = model.cuda()
+    model = model.to(device)
 
     # optimizer
     optimizer.load_state_dict(checkpoint['optimizer_state'])
