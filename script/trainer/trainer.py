@@ -9,7 +9,7 @@ from script.evaluator.avgmeter import AverageMeter
 from script.evaluator.ioueval import iouEval
 
 
-def train(logger, model, datasets, args, cfg, device):
+def train(logger, model, datasets, args, cfg):
 
     # set train loader
     datasets = datasets if isinstance(datasets, (list, tuple)) else [datasets]
@@ -106,9 +106,9 @@ def train(logger, model, datasets, args, cfg, device):
     
     # set evaluator
     if cfg.DATA.DATASET == 'nuscenes':
-        evaluator = iouEval(device, n_classes=16+1, ignore=0)
+        evaluator = iouEval(n_classes=16+1, ignore=0)
     elif cfg.DATA.DATASET == 'semantickitti' or cfg.DATA.DATASET == 'scribblekitti':
-        evaluator = iouEval(device, n_classes=19+1, ignore=0)
+        evaluator = iouEval(n_classes=19+1, ignore=0)
     else:
         raise NotImplementedError
 
@@ -225,7 +225,6 @@ def train(logger, model, datasets, args, cfg, device):
                     model=model,
                     criterion=[WCE, LS],
                     info=info,
-                    device=device,
                     args=args
                 )
 

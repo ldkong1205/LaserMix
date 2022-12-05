@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='LaserMix/script/cfgs/nuscenes/range.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -28,12 +28,12 @@ def get_args():
                         help='name of the dataset we are going to use.')
     # -- for nuScenes --
     parser.add_argument('--root_nusc', type=str, 
-                        help='file root path for the nuScenes databas.', default='/Users/ldkong/Documents/data/sets/nuScenes-mini')
+                        help='file root path for the nuScenes databas.', default='/nvme/share/data/sets/nuScenes')
     parser.add_argument('--horiz_angular_res', type=float, choices=[0.1875, 0.375],
                         help='resolution of horizontal angular.', default=0.1875)
     # -- for SemanticKITTI --
     parser.add_argument('--root_semkitti', type=str, 
-                        help='file root path for the SemanticKITTI database.', default='/Users/ldkong/Documents/data/sets/SemanticKITTI/')
+                        help='file root path for the SemanticKITTI database.', default='/nvme/share/data/sets/SemanticKITTI/')
     parser.add_argument('--yaml', type=str, 
                         help='path for yaml configuration file.', default='data/semantickitti/semantickitti.yaml')
     parser.add_argument('--H', type=int, 
@@ -67,7 +67,6 @@ def main():
     set_random_seed(cfg.GENERAL.SEED, deterministic=args.deterministic)
 
     # set device
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     torch.backends.cudnn.benchmark = True
 
     # set logger
@@ -88,17 +87,17 @@ def main():
         from data.nuscenes.nusc import NuscLidarSegDatabase
         from data.nuscenes.dataset_rv import LidarSegRangeViewDataset
 
-        raw_db = nuScenes('v1.0-mini', args.root_nusc, True, 0.1)
+        raw_db = nuScenes('v1.0-trainval', args.root_nusc, True, 0.1)
         database_train = NuscLidarSegDatabase(
             nusc_db=raw_db, 
             label_mapping_name='official',
-            split='mini_train',
+            split='train',
             min_distance=0.9,
         )
         database_val = NuscLidarSegDatabase(
             nusc_db=raw_db, 
             label_mapping_name='official',
-            split='mini_val',
+            split='val',
             min_distance=0.9,
         )
         datasets = [
@@ -156,7 +155,7 @@ def main():
     logger.info("Model parameters: '{:.3f} M".format(get_n_params(model)/1e6))
 
     # turn to trainer
-    train(logger, model, datasets, args, cfg, device)
+    train(logger, model, datasets, args, cfg)
 
 if __name__ == '__main__':
     main()

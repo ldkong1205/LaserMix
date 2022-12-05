@@ -10,8 +10,6 @@ from data.nuscenes.lidar import LidarPointCloud, LidarSegDatabaseInterface
 from data.nuscenes.utils import get_range_view_inputs, DataSample
 from data.nuscenes.augment import NoAugment, GlobalAugment
 
-# from utils import MixTeacherNusc
-
 
 class LidarSegRangeViewDataset(data.Dataset):
 
@@ -45,17 +43,6 @@ class LidarSegRangeViewDataset(data.Dataset):
             self.range_w = 960
         print("Horizontal angular resolution: '{}'.".format(self.range_w))
 
-        # lasermix
-        # if self.if_beam_mix > 0:
-        #     strategy = 'mixtureV2'
-        #     self.BeamMix = MixTeacherNusc(strategy=strategy)
-        #     print("Lasermix strategy: '{}'.".format(strategy))
-        
-        # print("Prob (RangeMix): {}.".format(self.if_beam_mix))
-        # print("Prob (RangePaster): {}.".format(self.if_copy_paste))
-        # print("Prob (RangeUnion): {}.".format(self.if_range_union))
-
-        # create channel-to-index (ch2idx) map; depth and binary mask is always computed at the last
         self.ch2idx = {'x': 0, 'y': 1, 'z': 2, 'intensity': 3, 'depth': -2, 'binary_mask': -1}
 
         # set-up caching
@@ -80,25 +67,6 @@ class LidarSegRangeViewDataset(data.Dataset):
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor, np.ndarray, str]:
         token = self.db.tokens[index]
         rv, label_rv, idx_rv = self.pull_item(token)
-
-        # RangeAug: range view data augmentations
-        if self.if_beam_mix > 0 or self.if_range_union > 0 or self.if_copy_paste > 0:
-
-            idx = np.random.randint(0, len(self.db.tokens))
-
-            token_ = self.db.tokens[idx]
-            rv_, label_rv_, idx_rv_ = self.pull_item(token_)
-
-            if np.random.random() >= (1 - self.if_beam_mix):  # BeamMix
-                rv_mix1, label_rv_mix1, rv_mix2, label_rv_mix2, s = self.BeamMix.forward(rv, label_rv, rv_, label_rv_)
-
-                if np.random.random() >= 0.5:
-                    rv, label_rv = rv_mix1, label_rv_mix1
-                else:
-                    rv, label_rv = rv_mix2, label_rv_mix2
-
-            if np.random.random() >= (1 - self.if_copy_paste): # RangePaste
-                rv, label_rv = self.RangePaste(rv, label_rv, rv_, label_rv_)
 
         return rv, label_rv, idx_rv, token
 
@@ -176,7 +144,7 @@ class LidarSegRangeViewDataset(data.Dataset):
             ignore_label=self.db.local2id['ignore_label']
         )
 
-        lidar_mask = rv[:, :, -1] == 1  # [32, 1920]
+        lidar_mask = rv[:, :, -1] == 1  # [H, W]
         if self.log_intensity:
             rv[lidar_mask, 3] = np.log(1e-5 + rv[lidar_mask, 3])
         if self.mean is not None:
@@ -189,8 +157,8 @@ class LidarSegRangeViewDataset(data.Dataset):
 
     def pull_item(self, token: str) -> Tuple[torch.Tensor, torch.Tensor, np.ndarray]:
         rv, label_rv, idx_rv = self.pull_item_core(token)
-        rv = torch.from_numpy(rv).permute(2, 0, 1).float()  # [6, 32, 1920]
-        label_rv = torch.from_numpy(label_rv.astype(int))   # [32, 1920]
+        rv = torch.from_numpy(rv).permute(2, 0, 1).float()  # [6, H, W]
+        label_rv = torch.from_numpy(label_rv.astype(int))   # [H, W]
 
         return rv, label_rv, idx_rv
 
