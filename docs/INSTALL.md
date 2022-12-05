@@ -35,3 +35,16 @@ conda activate lasermix
 conda install pytorch==1.10.1 torchvision==0.11.2 cudatoolkit=11.3 -c pytorch -c conda-forge
 ```
 
+### Step 4: Install Necessary Libraries
+#### 4.1 - [nuScenes devkit](https://github.com/nutonomy/nuscenes-devkit) :oncoming_automobile:
+```
+pip install nuscenes-devkit 
+```
+
+#### 4.2 - [PyTorch Scatter](https://github.com/rusty1s/pytorch_scatter)
+```
+conda install pytorch-scatter -c pyg
+```
+
+
+
