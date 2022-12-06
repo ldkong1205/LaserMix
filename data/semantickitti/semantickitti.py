@@ -20,12 +20,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
         split: str,
         range_img_size: tuple = (64, 2048),
         data_split: str = None,
-        if_range_mask: bool = False,
-        if_drop: bool = False,
-        if_flip: bool = False,
-        if_scale: bool = False,
-        if_rotate: bool = False,
-        if_jitter: bool = False,
+        augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
     ):
@@ -37,6 +32,32 @@ class SemkittiLidarSegDatabase(data.Dataset):
         self.color_dict = self.CFG["color_map"]
         self.label_transfer_dict = self.CFG["learning_map"]  # label mapping
         self.nclasses = len(self.color_dict)  # 34
+        
+        self.augment = augment
+        self.if_scribble = if_scribble
+        self.if_sup_only = if_sup_only
+
+        if self.augment == 'GlobalAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = True, True, True, True, True
+        elif self.augment == 'NoAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, False, False, False, False
+        else:
+            raise NotImplementedError
+
+        self.A=SemLaserScan(
+            nclasses = self.nclasses,
+            sem_color_dict = self.color_dict,
+            project = True,
+            H = self.H,
+            W = self.W, 
+            fov_up = 3.0,
+            fov_down = -25.0,
+            if_drop = self.if_drop,
+            if_flip = self.if_flip,
+            if_scale = self.if_scale,
+            if_rotate = self.if_rotate,
+            if_jitter = self.if_jitter,
+        )
 
         if data_split == 'full':
             self.data_split_list_path = None
@@ -55,27 +76,6 @@ class SemkittiLidarSegDatabase(data.Dataset):
             with open(self.data_split_list_path, "r") as f:
                 data_split_list = f.read().splitlines()
             data_split_list = [i.split('train/')[-1] for i in data_split_list]
-        
-        self.if_drop = if_drop
-        self.if_flip = if_flip
-        self.if_scale = if_scale
-        self.if_rotate = if_rotate
-        self.if_jitter = if_jitter
-
-        self.A=SemLaserScan(
-            nclasses = self.nclasses,
-            sem_color_dict = self.color_dict,
-            project = True,
-            H = self.H,
-            W = self.W, 
-            fov_up = 3.0,
-            fov_down = -25.0,
-            if_drop = self.if_drop,
-            if_flip = self.if_flip,
-            if_scale = self.if_scale,
-            if_rotate = self.if_rotate,
-            if_jitter = self.if_jitter,
-        )
 
         if self.split == 'train': folders = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
         elif self.split == 'val': folders = ['08']
@@ -91,13 +91,17 @@ class SemkittiLidarSegDatabase(data.Dataset):
             self.lidar_list_labeled = [self.root + 'sequences/' + i for i in data_split_list]
             self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
             self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
-            print("Loading '{}' labeled samples from SemanticKITTI under '{}' split ...".format(len(self.lidar_list_labeled), self.split))
+            print("Loading '{}' labeled samples ('{:.1f}'%) from SemanticKITTI under '{}' split ...".format(
+                len(self.lidar_list_labeled), (len(self.lidar_list_labeled) / len(self.label_list)) * 100, self.split)
+            )
 
             if not if_sup_only:
                 self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
                 self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
                 self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
-                print("Loading '{}' unlabeled samples from SemanticKITTI under '{}' split ...".format(len(self.lidar_list_unlabeled), self.split))
+                print("Loading '{}' unlabeled samples ('{:.1f}'%) from SemanticKITTI under '{}' split ...".format(
+                    len(self.lidar_list_unlabeled), (len(self.lidar_list_unlabeled) / len(self.label_list)) * 100, self.split)
+                )
 
                 self.lidar_list_labeled = self.lidar_list_labeled * int(np.ceil(len(self.lidar_list_unlabeled) / len(self.lidar_list_labeled)))
 
