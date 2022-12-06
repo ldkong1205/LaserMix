@@ -4,7 +4,7 @@ SUFFIX: ''
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
-    SPLIT: '1pct'  # choices: ['1pct', '10pct', '20pct', '50pct']
+    SPLIT: '1pct'  # choices: ['1pct', '10pct', '20pct', '50pct', 'full']
     IF_SUP_ONLY: True
 
 MODEL:

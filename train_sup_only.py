@@ -94,12 +94,16 @@ def main():
             label_mapping_name='official',
             split='train',
             min_distance=0.9,
+            data_split=cfg.DATA.SPLIT,
+            if_sup_only=cfg.DATA.IF_SUP_ONLY,
         )
         database_val = NuscLidarSegDatabase(
             nusc_db=raw_db, 
             label_mapping_name='official',
             split='val',
             min_distance=0.9,
+            data_split='full',
+            if_sup_only=cfg.DATA.IF_SUP_ONLY,
         )
         datasets = [
             LidarSegRangeViewDataset(

@@ -18,6 +18,8 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
             split: str,
             min_distance: float = 0.9,
             max_distance: float = 100.0,
+            data_split: str = None,
+            if_sup_only: bool = False,
         ):
         self.db = nusc_db
         self._raw_mapping = NuscLidarSegLabelMappings.raw_mappings(nusc_db)[label_mapping_name]
@@ -26,6 +28,7 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
         self.max_distance = max_distance
         self._tokens = None
         self.n_rings = 32
+        self.if_sup_only = if_sup_only
 
         assert self.min_distance >= 0.0, f'min_distance {min_distance} should not be negative.'
         assert self.max_distance > 0.0, f'max_distance {max_distance} should not be 0 or negative. '
@@ -33,6 +36,19 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
         self.globalid2localid = {}
         for _id, _name in self.db.lidarseg_idx2name_mapping.items():
             self.globalid2localid[_id] = self.local2id[self.global2local[_name]]
+
+        if data_split == 'full':
+            self.data_split_list_path = None
+        elif data_split == '1pct':
+            self.data_split_list_path = 'script/split/nuscenes/nuscenes_1pct.txt'
+        elif data_split == '10pct':
+            self.data_split_list_path = 'script/split/nuscenes/nuscenes_10pct.txt'
+        elif data_split == '20pct':
+            self.data_split_list_path = 'script/split/nuscenes/nuscenes_20pct.txt'
+        elif data_split == '50pct':
+            self.data_split_list_path = 'script/split/nuscenes/nuscenes_50pct.txt'
+        else:
+            raise NotImplementedError
 
     @property
     def db_version(self) -> str:
@@ -43,16 +59,7 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
 
         if self._tokens is None:
 
-            if self.split == 'trainval':
-                sample_tokens = \
-                    NuscenesLidarMethods.splits(split='train', db=self.db) + \
-                    NuscenesLidarMethods.splits(split='val', db=self.db)
-            elif self.split == 'train_test':
-                self.sample_tokens_train = NuscenesLidarMethods.splits(split='train', db=self.db)
-                self.sample_tokens_test = NuscenesLidarMethods.splits(split='test', db=self.db)
-                sample_tokens = self.sample_tokens_train + self.sample_tokens_test
-            else:
-                sample_tokens = NuscenesLidarMethods.splits(split=self.split, db=self.db)
+            sample_tokens = NuscenesLidarMethods.splits(split=self.split, db=self.db)
 
             self._tokens = sample_tokens
 

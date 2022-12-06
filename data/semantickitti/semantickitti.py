@@ -95,7 +95,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
                 len(self.lidar_list_labeled), (len(self.lidar_list_labeled) / len(self.label_list)) * 100, self.split)
             )
 
-            if not if_sup_only:
+            if not self.if_sup_only:
                 self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
                 self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
                 self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
