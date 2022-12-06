@@ -111,26 +111,26 @@ class SemkittiLidarSegDatabase(data.Dataset):
         self.A.open_scan(self.lidar_list[index])
         self.A.open_label(self.label_list[index])
 
-        dataset_dict = {}
+        data_dict = {}
 
-        dataset_dict['xyz'] = self.A.proj_xyz
-        dataset_dict['intensity'] = self.A.proj_remission
-        dataset_dict['range_img'] = self.A.proj_range
-        dataset_dict['xyz_mask'] = self.A.proj_mask
+        data_dict['xyz'] = self.A.proj_xyz
+        data_dict['intensity'] = self.A.proj_remission
+        data_dict['range_img'] = self.A.proj_range
+        data_dict['xyz_mask'] = self.A.proj_mask
         
         semantic_label = self.A.proj_sem_label
         semantic_train_label = self.generate_label(semantic_label)
-        dataset_dict['semantic_label'] = semantic_train_label
+        data_dict['semantic_label'] = semantic_train_label
 
         split_point = random.randint(100, self.W-100)
-        dataset_dict = self.sample_transform(dataset_dict, split_point)
+        data_dict = self.sample_transform(data_dict, split_point)
 
-        scan, label, mask = self.prepare_input_label_semantic_with_mask(dataset_dict)
+        scan, label, mask = self.prepare_input_label_semantic_with_mask(data_dict)
 
         return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
 
 
-    def RangePaste(self, scan, label, mask, scan_, label_, mask_):
+    def InstMix(self, scan, label, mask, scan_, label_, mask_):
         scan_new = scan.copy()
         label_new = label.copy()
         mask_new = mask.copy()
