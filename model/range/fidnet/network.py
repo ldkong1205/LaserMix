@@ -204,32 +204,32 @@ class SemanticBackbone(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def _forward_impl(self, x):  # [bs, 6, 64, 512]
+    def _forward_impl(self, x):  # [bs, 6, H, W]
 
-        x = self.conv1(x)  # [bs, 64, 64, 512]
+        x = self.conv1(x)  # [bs, 64, H, W]
         x = self.bn_0(x)
         x = self.relu_0(x)
 
-        x = self.conv2(x)  # [bs, 128, 64, 512]
+        x = self.conv2(x)  # [bs, 128, H, W]
         x = self.bn(x)
         x = self.relu(x)
 
-        x = self.conv3(x)  # [bs, 256, 64, 512]
+        x = self.conv3(x)  # [bs, 256, H, W]
         x = self.bn_1(x)
         x = self.relu_1(x)
 
-        x = self.conv4(x)  # [bs, 512, 64, 512]
+        x = self.conv4(x)  # [bs, 512, H, W]
         x = self.bn_2(x)
         x = self.relu_2(x)
 
-        x_1 = self.layer1(x)     # [bs, 128, 64, 512]
-        x_2 = self.layer2(x_1)   # [bs, 128, 32, 256]
-        x_3 = self.layer3(x_2)   # [bs, 128, 16, 128]
-        x_4 = self.layer4(x_3)   # [bs, 128, 8, 64]
+        x_1 = self.layer1(x)     # [bs, 128, H, W]
+        x_2 = self.layer2(x_1)   # [bs, 128, H/2, W/2]
+        x_3 = self.layer3(x_2)   # [bs, 128, H/4, W/4]
+        x_4 = self.layer4(x_3)   # [bs, 128, H/8, W/8]
 
-        res_2 = F.interpolate(x_2, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, 64, 512]
-        res_3 = F.interpolate(x_3, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, 64, 512]
-        res_4 = F.interpolate(x_4, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, 64, 512]
+        res_2 = F.interpolate(x_2, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, H, W]
+        res_3 = F.interpolate(x_3, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, H, W]
+        res_4 = F.interpolate(x_4, size=x.size()[2:], mode='bilinear', align_corners=True)  # [bs, 128, H, W]
         
         res=[x, x_1, res_2, res_3, res_4]
 

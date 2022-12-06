@@ -143,8 +143,15 @@ def main():
 
     # set model
     if cfg.MODEL.MODALITY == 'range':
-        from model.range.fidnet.network import FIDNet
-        model = FIDNet(num_class=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1)
+
+        if cfg.MODEL.BACKBONE == 'fidnet':
+            from model.range.fidnet.network import FIDNet
+            model = FIDNet(num_class=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1)
+        elif cfg.MODEL.BACKBONE == 'cenet':
+            from model.range.cenet.network import CENet
+            model = CENet(num_class=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1, aux=False)
+        else:
+            raise NotImplementedError
 
     elif cfg.MODEL.MODALITY == 'voxel':
         pass

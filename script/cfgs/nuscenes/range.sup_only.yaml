@@ -9,6 +9,7 @@ DATA:
 
 MODEL:
     MODALITY: 'range'  # choices: ['range', 'voxel']
+    BACKBONE: 'cenet'  # choices: ['fidnet', 'cenet']
     RESOLUTION:
         NUSCENES: [32, 1920]
         SEMANTICKITTI: [64, 2048]

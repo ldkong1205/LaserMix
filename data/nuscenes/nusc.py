@@ -61,9 +61,26 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
 
             sample_tokens = NuscenesLidarMethods.splits(split=self.split, db=self.db)
 
-            self._tokens = sample_tokens
+            if self.data_split_list_path:
 
-            print("Loading '{}' samples under '{}' split ...".format(len(self._tokens), self.split))
+                if self.data_split_list_path:
+                    with open(self.data_split_list_path, "r") as f:
+                        self.token_list_labeled = f.read().splitlines()
+                        print("Loading '{}' labeled samples ('{:.1f}'%) from nuScenes under '{}' split ...".format(
+                            len(self.token_list_labeled), (len(self.token_list_labeled) / len(sample_tokens)) * 100, self.split)
+                        )
+
+                    if not self.if_sup_only:
+                        self.token_list_unlabeled = [i for i in sample_tokens if i not in self.token_list_labeled]
+                        print("Loading '{}' unlabeled samples ('{:.1f}'%) from nuScenes under '{}' split ...".format(
+                            len(self.token_list_unlabeled), (len(self.token_list_unlabeled) / len(sample_tokens)) * 100, self.split)
+                        )
+
+                        self.token_list_labeled = self.token_list_labeled * int(np.ceil(len(self.token_list_unlabeled) / len(self.token_list_labeled)))
+
+                    
+
+            self._tokens = sample_tokens
         
         return self._tokens
 
@@ -90,10 +107,8 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
             assert len(points_label) == len(points),\
                 f'lidar seg labels {len(points_label)} does not match lidar points {len(points)}'
 
-            # map global label id to local label id
             points_label = list(map(lambda x: self.globalid2localid.get(x), list(points_label)))  # m
 
-        # filter points
         depth = np.linalg.norm(points[:, :2], axis=1)  # [m,]
         if self.min_distance != 0.0:
             points = points[depth >= self.min_distance]  # [n, 5]
@@ -114,13 +129,6 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
         ring: np.ndarray = None,
         horiz_angular_res: float = 0.1875
         ) -> Tuple[np.ndarray, np.ndarray, int, int]:
-        # Get the "image" coordinates for each point.
-        # Velodyne HDL32E has 32 beams, horizontal angular resolution of 0.4 and FOV of -30 to 10 with
-        # vertical angular resolution of 1.33deg.
-        # https://www.egps.net/datasheets/Velodyne-HDL-32E-Scanner-Datasheet.pdf
-
-        # Setting horizontal angular resolution to 0.375 to obtain an image_width of 960.
-        # This way, it can be well upsampled by the backbone.
         if proj_type == 'cylindrical' and ring is not None:
             proj_y, proj_x, ht, wt = get_range_proj_coordinates(
                 points[:, :3],
@@ -138,7 +146,7 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
                 proj_fov_down=-30
             )
         else:
-            raise ValueError(f'Unknown projection type {proj_type} choose either cylindrical or spherical!')
+            raise NotImplementedError
         
         return proj_y, proj_x, ht, wt
 
