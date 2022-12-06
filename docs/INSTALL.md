@@ -4,7 +4,7 @@
 
 ### General Requirements
 
-This codebase is tested with `torch==1.10.1` and `torchvision==0.11.2`, with `CUDA 11.3`. In order to successfully reproduce the results reported in our paper, we recommend you to follow the exact same configuation with us. However, similar versions that came out lately should be good as well.
+This codebase is tested with `torch==1.11.0` and `torchvision==0.12.0`, with `CUDA 11.3`. In order to successfully reproduce the results reported in our paper, we recommend you to follow the exact same configuation with us. However, similar versions that came out lately should be good as well.
 
 ### Range View
 
@@ -22,7 +22,7 @@ For the **voxel option**, we use a more compact version of [Cylinder3D](https://
 
 ### Step 1: Create Enviroment
 ```
-conda create -n lasermix python=3.9
+conda create -n lasermix python=3.10
 ```
 
 ### Step 2: Activate Enviroment
@@ -32,7 +32,7 @@ conda activate lasermix
 
 ### Step 3: Install PyTorch
 ```
-conda install pytorch==1.10.1 torchvision==0.11.2 cudatoolkit=11.3 -c pytorch -c conda-forge
+conda install pytorch==1.11.0 torchvision==0.12.0 cudatoolkit=11.3 -c pytorch
 ```
 
 ### Step 4: Install Necessary Libraries
@@ -44,6 +44,11 @@ pip install nuscenes-devkit
 #### 4.2 - [PyTorch Scatter](https://github.com/rusty1s/pytorch_scatter)
 ```
 conda install pytorch-scatter -c pyg
+```
+
+#### 4.x - Other Packages
+```
+pip install pyyaml easydict
 ```
 
 
