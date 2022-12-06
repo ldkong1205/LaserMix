@@ -23,7 +23,7 @@ TRAIN:
 VALID:
     BATCH_SIZE: 24
     NUM_WORKERS: 8
-    EPOCH_START_VAL: 0
+    EPOCH_START_VAL: 10
 
 OPTIM:
     LOSS: 'dice'  # choices: ['wce', 'dice']
