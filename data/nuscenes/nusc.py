@@ -66,19 +66,19 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
                 if self.data_split_list_path:
                     with open(self.data_split_list_path, "r") as f:
                         self.token_list_labeled = f.read().splitlines()
-                        print("Loading '{}' labeled samples ('{:.1f}'%) from nuScenes under '{}' split ...".format(
+                        print("Loading '{}' labeled samples ('{:.1f}%') from nuScenes under '{}' split ...".format(
                             len(self.token_list_labeled), (len(self.token_list_labeled) / len(sample_tokens)) * 100, self.split)
                         )
 
                     if not self.if_sup_only:
                         self.token_list_unlabeled = [i for i in sample_tokens if i not in self.token_list_labeled]
-                        print("Loading '{}' unlabeled samples ('{:.1f}'%) from nuScenes under '{}' split ...".format(
+                        print("Loading '{}' unlabeled samples ('{:.1f}%') from nuScenes under '{}' split ...".format(
                             len(self.token_list_unlabeled), (len(self.token_list_unlabeled) / len(sample_tokens)) * 100, self.split)
                         )
 
                         self.token_list_labeled = self.token_list_labeled * int(np.ceil(len(self.token_list_unlabeled) / len(self.token_list_labeled)))
 
-                    
+                sample_tokens = self.token_list_labeled
 
             self._tokens = sample_tokens
         

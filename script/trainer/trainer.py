@@ -43,7 +43,7 @@ def train(logger, model, datasets, args, cfg, device):
             lr=cfg.OPTIM.LEARNING_RATE,
             betas=(0.9, 0.999),
             weight_decay=0.01,
-            eps=1e-5
+            eps=1e-6
         )
     elif cfg.OPTIM.OPTIMIZER == 'sgd':
         optimizer = torch.optim.SGD(

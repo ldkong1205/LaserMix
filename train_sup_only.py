@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/range.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -39,7 +39,7 @@ def get_args():
     parser.add_argument('--H', type=int, 
                         help='height for range view projection.', default=64)
     parser.add_argument('--W', type=int, 
-                        help='width for range view projection.', default=2048)
+                        help='width for range view projection.', default=1920)
     # == training configs ==
     parser.add_argument('--amp', action='store_true',
                         help='whether to conduct automatic mixed precision training.')

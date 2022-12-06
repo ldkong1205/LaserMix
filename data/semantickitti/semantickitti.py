@@ -18,7 +18,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
         self,
         root: str,
         split: str,
-        range_img_size: tuple = (64, 2048),
+        range_img_size: tuple = (64, 1920),
         data_split: str = None,
         augment: str = 'NoAugment',
         if_scribble: bool = False,
@@ -91,7 +91,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
             self.lidar_list_labeled = [self.root + 'sequences/' + i for i in data_split_list]
             self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
             self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
-            print("Loading '{}' labeled samples ('{:.1f}'%) from SemanticKITTI under '{}' split ...".format(
+            print("Loading '{}' labeled samples ('{:.1f}%') from SemanticKITTI under '{}' split ...".format(
                 len(self.lidar_list_labeled), (len(self.lidar_list_labeled) / len(self.label_list)) * 100, self.split)
             )
 
@@ -99,7 +99,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
                 self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
                 self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
                 self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
-                print("Loading '{}' unlabeled samples ('{:.1f}'%) from SemanticKITTI under '{}' split ...".format(
+                print("Loading '{}' unlabeled samples ('{:.1f}%') from SemanticKITTI under '{}' split ...".format(
                     len(self.lidar_list_unlabeled), (len(self.lidar_list_unlabeled) / len(self.label_list)) * 100, self.split)
                 )
 
