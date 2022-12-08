@@ -63,30 +63,32 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
 
             if self.data_split_list_path:
 
-                if self.data_split_list_path:
-                    with open(self.data_split_list_path, "r") as f:
-                        self.token_list_labeled = f.read().splitlines()
-                        print("Loading '{}' labeled samples ('{:.1f}%') from nuScenes under '{}' split ...".format(
-                            len(self.token_list_labeled), (len(self.token_list_labeled) / len(sample_tokens)) * 100, self.split)
-                        )
+                with open(self.data_split_list_path, "r") as f:
+                    self.token_list_labeled = f.read().splitlines()
+                print("Loading '{}' labeled samples ('{:.0f}%') from nuScenes under '{}' split ...".format(
+                    len(self.token_list_labeled), (len(self.token_list_labeled) / len(sample_tokens)) * 100, self.split)
+                )
 
-                    if not self.if_sup_only:
-                        self.token_list_unlabeled = [i for i in sample_tokens if i not in self.token_list_labeled]
-                        print("Loading '{}' unlabeled samples ('{:.1f}%') from nuScenes under '{}' split ...".format(
-                            len(self.token_list_unlabeled), (len(self.token_list_unlabeled) / len(sample_tokens)) * 100, self.split)
-                        )
+                self.token_list_unlabeled = [i for i in sample_tokens if i not in self.token_list_labeled]
+                print("Loading '{}' unlabeled samples ('{:.0f}%') from nuScenes under '{}' split ...".format(
+                    len(self.token_list_unlabeled), (len(self.token_list_unlabeled) / len(sample_tokens)) * 100, self.split)
+                )
 
-                        self.token_list_labeled = self.token_list_labeled * int(np.ceil(len(self.token_list_unlabeled) / len(self.token_list_labeled)))
+                self.token_list_labeled = self.token_list_labeled * int(np.ceil(len(self.token_list_unlabeled) / len(self.token_list_labeled)))
 
-                sample_tokens = self.token_list_labeled
+                if self.if_sup_only:
+                    self._tokens = self.token_list_labeled
+                else:
+                    self._tokens = self.token_list_unlabeled
 
-            self._tokens = sample_tokens
+            else:
+                self._tokens = sample_tokens
         
         return self._tokens
 
     def load_from_db(self, token: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         pc = load_pointcloud_from_db(self.db, token, include_ring=True)
-        points = pc.points[:-1].T  # exclude timestamp (which is found at the end) and then transpose
+        points = pc.points[:-1].T
 
         sample = self.db.get('sample', token)
         sample_data_token = sample['data']['LIDAR_TOP']
@@ -94,7 +96,7 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
         if 'test' in self.split:
             if self.split == 'train_test':
                 lidarseg_labels_filename = '' + token
-                points_label = np.fromfile(lidarseg_labels_filename, dtype=np.uint8)  # [m,]
+                points_label = np.fromfile(lidarseg_labels_filename, dtype=np.uint8)
             else:
                 points_label = np.zeros((points.shape[0],), dtype=np.uint8)  # dummy labels; won't be needed in test
         else:
@@ -102,14 +104,14 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
                 self.db.dataroot,
                 self.db.get('lidarseg', sample_data_token)['filename']
             )
-            points_label = np.fromfile(lidarseg_labels_filename, dtype=np.uint8)  # [m,]
+            points_label = np.fromfile(lidarseg_labels_filename, dtype=np.uint8)
 
             assert len(points_label) == len(points),\
                 f'lidar seg labels {len(points_label)} does not match lidar points {len(points)}'
 
-            points_label = list(map(lambda x: self.globalid2localid.get(x), list(points_label)))  # m
+            points_label = list(map(lambda x: self.globalid2localid.get(x), list(points_label)))
 
-        depth = np.linalg.norm(points[:, :2], axis=1)  # [m,]
+        depth = np.linalg.norm(points[:, :2], axis=1)
         if self.min_distance != 0.0:
             points = points[depth >= self.min_distance]  # [n, 5]
             points_label = np.atleast_2d(points_label)[np.atleast_2d(depth) >= self.min_distance]  # [n, 5]

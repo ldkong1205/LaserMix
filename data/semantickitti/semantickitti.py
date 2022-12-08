@@ -3,6 +3,7 @@ import cv2
 import glob
 import random
 import yaml
+from typing import Dict, List, Tuple
 
 import numpy as np
 import torch
@@ -124,7 +125,7 @@ class SemkittiLidarSegDatabase(data.Dataset):
     def __len__(self):
         return len(self.lidar_list)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         self.A.open_scan(self.lidar_list[index])
         self.A.open_label(self.label_list[index])
 
@@ -147,7 +148,11 @@ class SemkittiLidarSegDatabase(data.Dataset):
         return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
 
 
-    def InstMix(self, scan, label, mask, scan_, label_, mask_):
+    def InstMix(
+        self,
+        scan: np.ndarray, label: np.ndarray, mask: np.ndarray,
+        scan_: np.ndarray, label_: np.ndarray, mask_: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         scan_new = scan.copy()
         label_new = label.copy()
         mask_new = mask.copy()
@@ -260,31 +265,31 @@ class SemkittiLidarSegDatabase(data.Dataset):
         return dataset_dict
 
 
-    def sem_label_transform(self,raw_label_map):
+    def sem_label_transform(self, raw_label_map: np.ndarray):
         for i in self.label_transfer_dict.keys():
-            raw_label_map[raw_label_map==i]=self.label_transfer_dict[i]
+            raw_label_map[raw_label_map==i] = self.label_transfer_dict[i]
         
         return raw_label_map
 
 
-    def generate_label(self,semantic_label):
-        original_label=np.copy(semantic_label)
-        label_new=self.sem_label_transform(original_label)
+    def generate_label(self, semantic_label: np.ndarray):
+        original_label = np.copy(semantic_label)
+        label_new = self.sem_label_transform(original_label)
         
         return label_new
 
 
-    def fill_spherical(self,range_image):
-        height,width=np.shape(range_image)[:2]
-        value_mask=np.asarray(1.0-np.squeeze(range_image)>0.1).astype(np.uint8)
+    def fill_spherical(self, range_image: np.ndarray):
+        height, width = np.shape(range_image)[:2]
+        value_mask = np.asarray(1.0-np.squeeze(range_image) > 0.1).astype(np.uint8)
         dt, lbl = cv2.distanceTransformWithLabels(value_mask, cv2.DIST_L1, 5, labelType=cv2.DIST_LABEL_PIXEL)
-        with_value=np.squeeze(range_image)>0.1
-        depth_list=np.squeeze(range_image)[with_value]
-        label_list=np.reshape(lbl,[1,height*width])
-        depth_list_all=depth_list[label_list-1]
-        depth_map=np.reshape(depth_list_all,(height,width))
-        depth_map = cv2.GaussianBlur(depth_map,(7,7),0)
-        depth_map=range_image*with_value+depth_map*(1-with_value)
+        with_value = np.squeeze(range_image) > 0.1
+        depth_list = np.squeeze(range_image)[with_value]
+        label_list = np.reshape(lbl, [1, height * width])
+        depth_list_all = depth_list[label_list - 1]
+        depth_map = np.reshape(depth_list_all, (height, width))
+        depth_map = cv2.GaussianBlur(depth_map, (7, 7), 0)
+        depth_map = range_image * with_value + depth_map * (1 - with_value)
         
         return depth_map
                    
