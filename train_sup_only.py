@@ -154,30 +154,30 @@ def main():
             raise NotImplementedError
 
     elif cfg.MODEL.MODALITY == 'voxel':
-        from model.voxel.cylinder3d.asymm import Asymm_3d_spconv
-        from model.voxel.cylinder3d.cylinder_fea_generator import cylinder_fea
-        from model.voxel.cylinder3d.cylinder_spconv_3d import get_model_class
 
-        cylinder_3d_spconv_seg = Asymm_3d_spconv(
-            output_shape=[240, 180, 20],
-            use_norm=True,
-            num_input_features=16,
-            init_size=16,
-            nclasses=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
-        )
+        if cfg.MODEL.BACKBONE == 'cylinder3d':
+            from model.voxel.cylinder3d.module import asymm_3d_spconv, cylinder_fea
+            from model.voxel.cylinder3d.network import get_model_class
 
-        cy_fea_net = cylinder_fea(
-            grid_size=[240, 180, 20],
-            fea_dim=9,
-            out_pt_fea_dim=256,
-            fea_compre=16,
-        )
-
-        model = get_model_class("cylinder_asym")(
-            cylin_model=cy_fea_net,
-            segmentator_spconv=cylinder_3d_spconv_seg,
-            sparse_shape=[240, 180, 20]
-        )
+            cylinder_3d_spconv_seg = asymm_3d_spconv(
+                output_shape=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                num_input_features=cfg.MODEL.NUM_IN_FEA,
+                init_size=cfg.MODEL.INIT_SIZE,
+                nclasses=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+            )
+            cy_fea_net = cylinder_fea(
+                grid_size=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                fea_dim=9,
+                out_pt_fea_dim=256,
+                fea_compre=16,
+            )
+            model = get_model_class("cylinder_asym")(
+                sparse_shape=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                cylin_model=cy_fea_net,
+                segmentator_spconv=cylinder_3d_spconv_seg,
+            )
+        else:
+            raise NotImplementedError
 
     else:
         raise NotImplementedError
