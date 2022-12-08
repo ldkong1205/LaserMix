@@ -91,22 +91,35 @@ class SemkittiLidarSegDatabase(data.Dataset):
             self.lidar_list_labeled = [self.root + 'sequences/' + i for i in data_split_list]
             self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
             self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
-            print("Loading '{}' labeled samples ('{:.1f}%') from SemanticKITTI under '{}' split ...".format(
+            print("Loading '{}' labeled samples ('{:.0f}%') from SemanticKITTI under '{}' split ...".format(
                 len(self.lidar_list_labeled), (len(self.lidar_list_labeled) / len(self.label_list)) * 100, self.split)
             )
 
-            if not self.if_sup_only:
-                self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
-                self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
-                self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
-                print("Loading '{}' unlabeled samples ('{:.1f}%') from SemanticKITTI under '{}' split ...".format(
-                    len(self.lidar_list_unlabeled), (len(self.lidar_list_unlabeled) / len(self.label_list)) * 100, self.split)
-                )
+            self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
+            self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
+            self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
+            print("Loading '{}' unlabeled samples ('{:.0f}%') from SemanticKITTI under '{}' split ...".format(
+                len(self.lidar_list_unlabeled), (len(self.lidar_list_unlabeled) / len(self.label_list)) * 100, self.split)
+            )
 
-                self.lidar_list_labeled = self.lidar_list_labeled * int(np.ceil(len(self.lidar_list_unlabeled) / len(self.lidar_list_labeled)))
+            self.lidar_list_labeled = self.lidar_list_labeled * int(np.ceil(len(self.lidar_list_unlabeled) / len(self.lidar_list_labeled)))
+            self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
+            self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
 
-            self.lidar_list = self.lidar_list_labeled
-            self.label_list = self.label_list_labeled
+            assert len(self.lidar_list_labeled) == len(self.label_list_labeled)
+            assert len(self.lidar_list_unlabeled) == len(self.label_list_unlabeled)
+
+            if self.if_sup_only:
+                self.lidar_list = self.lidar_list_labeled
+                self.label_list = self.label_list_labeled
+            else:
+                self.lidar_list = self.lidar_list_unlabeled
+                self.label_list = self.label_list_unlabeled
+
+        if self.if_scribble:
+            self.label_list = [i.replace("SemanticKITTI", "ScribbleKITTI") for i in self.label_list]
+            self.label_list = [i.replace("labels", "scribbles") for i in self.label_list]
+
 
     def __len__(self):
         return len(self.lidar_list)

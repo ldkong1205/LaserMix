@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/scribblekitti/range.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -28,7 +28,7 @@ def get_args():
                         help='name of the dataset we are going to use.')
     # -- for nuScenes --
     parser.add_argument('--root_nusc', type=str, 
-                        help='file root path for the nuScenes databas.', default='/nvme/share/data/sets/nuScenes')
+                        help='file root path for the nuScenes database.', default='/nvme/share/data/sets/nuScenes')
     parser.add_argument('--horiz_angular_res', type=float,
                         help='resolution of horizontal angular.', default=0.1875)
     # -- for SemanticKITTI --
