@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/voxel.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -154,7 +154,30 @@ def main():
             raise NotImplementedError
 
     elif cfg.MODEL.MODALITY == 'voxel':
-        pass
+        from model.voxel.cylinder3d.asymm import Asymm_3d_spconv
+        from model.voxel.cylinder3d.cylinder_fea_generator import cylinder_fea
+        from model.voxel.cylinder3d.cylinder_spconv_3d import get_model_class
+
+        cylinder_3d_spconv_seg = Asymm_3d_spconv(
+            output_shape=[240, 180, 20],
+            use_norm=True,
+            num_input_features=16,
+            init_size=16,
+            nclasses=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+        )
+
+        cy_fea_net = cylinder_fea(
+            grid_size=[240, 180, 20],
+            fea_dim=9,
+            out_pt_fea_dim=256,
+            fea_compre=16,
+        )
+
+        model = get_model_class("cylinder_asym")(
+            cylin_model=cy_fea_net,
+            segmentator_spconv=cylinder_3d_spconv_seg,
+            sparse_shape=[240, 180, 20]
+        )
 
     else:
         raise NotImplementedError

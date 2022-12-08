@@ -5,7 +5,10 @@ from torch.nn import functional as F
 
 class FIDNet(nn.Module):
 
-    def __init__(self, num_class):
+    def __init__(
+        self,
+        num_class: int
+    ):
         super(FIDNet, self).__init__()
         self.backend=Backbone(if_BN=True, if_remission=True, if_range=True, with_normal=False)
         self.semantic_head=SemanticHead(num_class=num_class, input_channel=1024)
@@ -18,19 +21,36 @@ class FIDNet(nn.Module):
 
 class BasicBlock(nn.Module):
     expansion = 1
-    def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1, base_width=64, dilation=1, if_BN=None):
+    def __init__(
+        self,
+        inplanes: int,
+        planes: int,
+        stride: int = 1,
+        downsample = None,
+        groups: int = 1,
+        base_width: int = 64,
+        dilation: int = 1,
+        if_BN: bool = False,
+    ):
         super(BasicBlock, self).__init__()
 
         self.if_BN = if_BN
-        if self.if_BN: norm_layer = nn.BatchNorm2d
-        if groups != 1 or base_width != 64: raise ValueError('BasicBlock only supports groups=1 and base_width=64')
-        if dilation > 1: raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
+        if self.if_BN:
+            norm_layer = nn.BatchNorm2d
+        if groups != 1 or base_width != 64:
+            raise ValueError('BasicBlock only supports groups=1 and base_width=64')
+        if dilation > 1:
+            raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
 
         self.conv1 = conv3x3(inplanes, planes, stride)
-        if self.if_BN: self.bn1 = norm_layer(planes)
+        if self.if_BN:
+            self.bn1 = norm_layer(planes)
         self.relu = nn.LeakyReLU()
+
         self.conv2 = conv3x3(planes, planes)
-        if self.if_BN: self.bn2 = norm_layer(planes)
+        if self.if_BN:
+            self.bn2 = norm_layer(planes)
+        
         self.downsample = downsample
         self.stride = stride
 
@@ -38,13 +58,17 @@ class BasicBlock(nn.Module):
         identity = x
 
         out = self.conv1(x)
-        if self.if_BN: out = self.bn1(out)
+        if self.if_BN:
+            out = self.bn1(out)
         out = self.relu(out)
 
         out = self.conv2(out)
-        if self.if_BN: out = self.bn2(out)
+        if self.if_BN:
+            out = self.bn2(out)
 
-        if self.downsample is not None: identity = self.downsample(x)
+        if self.downsample is not None:
+            identity = self.downsample(x)
+        
         out += identity
         out = self.relu(out)
 
@@ -53,18 +77,36 @@ class BasicBlock(nn.Module):
 
 class Bottleneck(nn.Module):
     expansion = 1
-    def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1, base_width=64, dilation=1, if_BN=None):
+    def __init__(
+        self,
+        inplanes: int,
+        planes: int,
+        stride: int = 1,
+        downsample = None,
+        groups: int = 1,
+        base_width: int = 64,
+        dilation: int = 1,
+        if_BN: bool = False,
+    ):
         super(Bottleneck, self).__init__()
         self.if_BN = if_BN
-        if self.if_BN: norm_layer = nn.BatchNorm2d
+
+        if self.if_BN:
+            norm_layer = nn.BatchNorm2d
         width = int(planes * (base_width / 64.)) * groups
 
         self.conv1 = conv1x1(inplanes, width)
-        if self.if_BN: self.bn1 = norm_layer(width)
+        if self.if_BN:
+            self.bn1 = norm_layer(width)
+        
         self.conv2 = conv3x3(width, width, stride, groups, dilation)
-        if self.if_BN: self.bn2 = norm_layer(width)
+        if self.if_BN:
+            self.bn2 = norm_layer(width)
+        
         self.conv3 = conv1x1(width, planes * self.expansion)
-        if self.if_BN: self.bn3 = norm_layer(planes * self.expansion)
+        if self.if_BN:
+            self.bn3 = norm_layer(planes * self.expansion)
+        
         self.relu = nn.LeakyReLU()
         self.downsample = downsample
         self.stride = stride
@@ -73,17 +115,22 @@ class Bottleneck(nn.Module):
         identity = x
 
         out = self.conv1(x)
-        if self.if_BN: out = self.bn1(out)
+        if self.if_BN:
+            out = self.bn1(out)
         out = self.relu(out)
 
         out = self.conv2(out)
-        if self.if_BN: out = self.bn2(out)
+        if self.if_BN:
+            out = self.bn2(out)
         out = self.relu(out)
 
         out = self.conv3(out)
-        if self.if_BN: out = self.bn3(out)
+        if self.if_BN:
+            out = self.bn3(out)
 
-        if self.downsample is not None: identity = self.downsample(x)
+        if self.downsample is not None:
+            identity = self.downsample(x)
+        
         out += identity
         out = self.relu(out)
 
@@ -92,7 +139,11 @@ class Bottleneck(nn.Module):
 
 class SemanticHead(nn.Module):
 
-    def __init__(self, num_class=20, input_channel=1024):
+    def __init__(
+        self,
+        num_class: int = 20,
+        input_channel: int = 1024,
+    ):
         super(SemanticHead,self).__init__()
 
         self.conv_1=nn.Conv2d(input_channel, 512, 1)
@@ -120,9 +171,21 @@ class SemanticHead(nn.Module):
 
 class SemanticBackbone(nn.Module):
 
-    def __init__(self, block, layers, if_BN, if_remission, if_range, with_normal, norm_layer=None, groups=1, width_per_group=64):
+    def __init__(
+        self,
+        block,
+        layers,
+        if_BN: bool,
+        if_remission: bool,
+        if_range: bool,
+        with_normal: bool,
+        norm_layer = None,
+        groups: int = 1,
+        width_per_group: int = 64,
+    ):
         super(SemanticBackbone, self).__init__()
-        if norm_layer is None: norm_layer = nn.BatchNorm2d
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
         self.if_BN=if_BN
         self.if_remission=if_remission
@@ -243,15 +306,29 @@ def _backbone(arch, block, layers, if_BN, if_remission, if_range, with_normal):
     model = SemanticBackbone(block, layers, if_BN, if_remission, if_range, with_normal)
     return model
 
+
 def conv1x1(in_planes, out_planes, stride=1):
     """1x1 convolution"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+    return nn.Conv2d(
+        in_planes, out_planes,
+        kernel_size=1, stride=stride,
+        bias=False,
+    )
+
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=dilation, groups=groups, bias=False, dilation=dilation)
+    return nn.Conv2d(
+        in_planes, out_planes,
+        kernel_size=3, stride=stride, padding=dilation,
+        groups=groups, bias=False, dilation=dilation,
+    )
+
 
 def Backbone(if_BN, if_remission, if_range, with_normal):
     """ResNet-34 model from "Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>"""
-    return _backbone('resnet34', BasicBlock, [3, 4, 6, 3], if_BN, if_remission, if_range, with_normal)
+    return _backbone(
+        'resnet34', BasicBlock, [3, 4, 6, 3],
+        if_BN, if_remission, if_range, with_normal,
+    )
 

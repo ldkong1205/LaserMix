@@ -3,7 +3,7 @@ import cv2
 import glob
 import random
 import yaml
-from typing import Dict, List, Tuple
+from typing import Tuple
 
 import numpy as np
 import torch

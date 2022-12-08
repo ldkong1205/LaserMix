@@ -3,22 +3,39 @@ import torch
 from torch.nn import functional as F
 
 
-def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
-    """3x3 convolution with padding"""
+def conv3x3(
+    in_planes: int, out_planes: int, stride: int = 1,
+    groups: int = 1, dilation: int = 1,
+):
     return nn.Conv2d(
-        in_planes, out_planes, kernel_size=3, stride=stride,
-        padding=dilation, groups=groups, bias=False, dilation=dilation
+        in_planes, out_planes,
+        kernel_size=3, stride=stride,
+        padding=dilation, groups=groups,
+        bias=False, dilation=dilation,
     )
 
-def conv1x1(in_planes, out_planes, stride=1):
-    """1x1 convolution"""
+
+def conv1x1(
+    in_planes: int, out_planes: int, stride: int = 1,
+):
     return nn.Conv2d(
-        in_planes, out_planes, kernel_size=1, stride=stride, bias=False
+        in_planes, out_planes,
+        kernel_size=1, stride=stride,
+        bias=False,
     )
 
 
 class BasicConv2d(nn.Module):
-    def __init__(self, in_planes, out_planes, kernel_size, stride=1, padding=0, dilation=1, relu=True):
+    def __init__(
+        self,
+        in_planes: int,
+        out_planes: int,
+        kernel_size: int,
+        stride: int = 1,
+        padding: int = 0,
+        dilation: int = 1,
+        relu: bool = True
+    ):
         super(BasicConv2d, self).__init__()
         self.relu = relu
         self.conv = nn.Conv2d(
@@ -37,6 +54,7 @@ class BasicConv2d(nn.Module):
             x = self.relu(x)
         return x
 
+
 class Final_Model(nn.Module):
 
     def __init__(self, backbone_net, semantic_head):
@@ -53,9 +71,17 @@ class Final_Model(nn.Module):
 
 class BasicBlock(nn.Module):
     expansion = 1
-
-    def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1,
-                 base_width=64, dilation=1, if_BN=None):
+    def __init__(
+        self,
+        inplanes: int,
+        planes: int,
+        stride: int = 1,
+        downsample = None,
+        groups: int = 1,
+        base_width: int = 64,
+        dilation: int = 1,
+        if_BN: bool = False
+    ):
         super(BasicBlock, self).__init__()
         self.if_BN = if_BN
         if self.if_BN:
@@ -64,14 +90,16 @@ class BasicBlock(nn.Module):
             raise ValueError('BasicBlock only supports groups=1 and base_width=64')
         if dilation > 1:
             raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
-        # Both self.conv1 and self.downsample layers downsample the input when stride != 1
+
         self.conv1 = conv3x3(inplanes, planes, stride)
         if self.if_BN:
             self.bn1 = norm_layer(planes)
         self.relu = nn.LeakyReLU()
+
         self.conv2 = conv3x3(planes, planes)
         if self.if_BN:
             self.bn2 = norm_layer(planes)
+        
         self.downsample = downsample
         self.stride = stride
 
@@ -94,8 +122,17 @@ class BasicBlock(nn.Module):
 
 
 class CENet(nn.Module):
-    def __init__(self, num_class, aux, block=BasicBlock, layers=[3, 4, 6, 3], if_BN=True, zero_init_residual=False,
-                 norm_layer=None, groups=1, width_per_group=64):
+    def __init__(
+        self,
+        num_class: int,
+        aux: bool,
+        block = BasicBlock,
+        layers: list = [3, 4, 6, 3],
+        if_BN: bool = True,
+        norm_layer = None,
+        groups: int = 1,
+        width_per_group: int = 64
+    ):
         super(CENet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -156,7 +193,7 @@ class CENet(nn.Module):
 
         return nn.Sequential(*layers)
 
-    def forward(self, x):
+    def forward(self, x):  # [bs, 6,  H, W]
 
         x = self.conv1(x)  # [bs, 64,  H, W]
         x = self.conv2(x)  # [bs, 128, H, W]
