@@ -8,11 +8,11 @@ This codebase is tested with `torch==1.11.0` and `torchvision==0.12.0`, with `CU
 
 ### Range View
 
-For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x2048` for SemanticKITTI and ScribbleKITTI.
+For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x1920` for SemanticKITTI and ScribbleKITTI.
 
 
 ### Voxel
-For the **voxel option**, we use a more compact version of [Cylinder3D](https://github.com/xinge008/Cylinder3D) as the LiDAR segmentation backbone. It contains `28.13M` parameters (compared to 56.26M for the one used in the [original paper](https://arxiv.org/abs/2011.10033)). We also use a smaller voxel resolution `[240, 180, 20]` compared to the original configuration `[480, 360, 32]`. This saves around 4x memory consumption and further helps to speed up training.
+For the **voxel option**, we use a more compact version of [Cylinder3D](https://github.com/xinge008/Cylinder3D) as the LiDAR segmentation backbone. It contains `28.13M` parameters (compared to 56.26M for the one used in the [original paper](https://arxiv.org/abs/2011.10033)). We also use a smaller voxel resolution `[240, 180, 32]` compared to the original configuration `[480, 360, 32]`. This saves around 4x memory consumption and further helps to speed up training.
 
 #### Requirements
 - [torch-scatter](https://github.com/rusty1s/pytorch_scatter)
@@ -48,7 +48,7 @@ conda install pytorch-scatter -c pyg
 
 #### 4.x - Other Packages
 ```
-pip install pyyaml easydict
+pip install pyyaml easydict spconv_cu113 numba
 ```
 
 
