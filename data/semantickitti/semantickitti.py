@@ -282,7 +282,6 @@ class SemkittiCylinderDatabase(data.Dataset):
 
         points = pc_data['scan'][:, :3]  # x, y, z
         intensity = pc_data['scan'][:, 3]  # intensity
-        ring = pc_data['scan'][:, 4]  # ring
         labels = pc_data['label']
 
         # data aug (drop)
@@ -293,7 +292,6 @@ class SemkittiCylinderDatabase(data.Dataset):
             self.points_to_drop = np.unique(self.points_to_drop)
             points = np.delete(points, self.points_to_drop, axis=0)
             intensity = np.delete(intensity, self.points_to_drop)
-            ring = np.delete(ring, self.points_to_drop)
             labels = np.delete(labels, self.points_to_drop)
 
         # data aug (flip)
@@ -348,14 +346,9 @@ class SemkittiCylinderDatabase(data.Dataset):
         voxel_centers = (grid_ind.astype(np.float32) + 0.5) * intervals + min_bound
         return_xyz = xyz_pol - voxel_centers
         return_xyz = np.concatenate((return_xyz, xyz_pol, points[:, :2]), axis=1)
-        return_fea = np.concatenate((return_xyz, np.expand_dims(intensity, axis=-1), np.expand_dims(ring, axis=-1)), axis=1)
+        return_fea = np.concatenate((return_xyz, np.expand_dims(intensity, axis=-1)), axis=1)
         
-        return {
-            'voxel_label': processed_label,
-            'grid_ind': grid_ind,
-            'point_label': labels,
-            'point_feature': return_fea,
-        }
+        return (grid_ind, processed_label, return_fea, labels)
 
     def cart2polar(self, input_xyz):
         rho = np.sqrt(input_xyz[:, 0] ** 2 + input_xyz[:, 1] ** 2)
@@ -367,23 +360,3 @@ class SemkittiCylinderDatabase(data.Dataset):
         y = input_xyz_polar[0] * np.sin(input_xyz_polar[1])
         return np.stack((x, y, input_xyz_polar[2]), axis=0)
 
-    # @staticmethod
-    # def collate_batch(batch_list):
-    #     data_dict = defaultdict(list)
-    #     for cur_sample in batch_list:
-    #         for key, val in cur_sample.items():
-    #             data_dict[key].append(val)
-    #     batch_size = len(batch_list)
-    #     ret = {}
-    #     ret['voxel_label'] = torch.from_numpy(np.stack(data_dict['voxel_label']).astype(np.int))
-
-    #     grid_ind = []
-    #     for i_batch in range(batch_size):
-    #         grid_ind.append(
-    #             np.pad(data_dict['grid_ind'][i_batch], ((0, 0), (1, 0)), mode='constant', constant_values=i_batch)
-    #         )
-    #     ret['grid_ind'] = torch.from_numpy(np.concatenate(grid_ind))
-    #     ret['point_label'] = torch.from_numpy(np.concatenate(data_dict['point_label']))
-    #     ret['point_feature'] = torch.from_numpy(np.concatenate(data_dict['point_feature'])).type(torch.FloatTensor)
-
-    #     return ret
