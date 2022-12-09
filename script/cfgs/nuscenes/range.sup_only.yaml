@@ -16,7 +16,7 @@ MODEL:
         SCRIBBLEKITTI: [64, 1920]
 
 TRAIN:
-    NUM_EPOCHS: 75  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [15, 30, 45, 60]
+    NUM_EPOCHS: 75  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
     BATCH_SIZE: 32
     NUM_WORKERS: 8
 

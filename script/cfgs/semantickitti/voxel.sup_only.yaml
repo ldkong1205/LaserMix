@@ -6,6 +6,8 @@ DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
     SPLIT: 'full'  # choices: ['1pct', '10pct', '20pct', '50pct', 'full']
     IF_SUP_ONLY: True
+    MAX_VOLUME_SPACE: [50, 180, 2]
+    MIN_VOLUME_SPACE: [0, -180, -4]
 
 MODEL:
     MODALITY: 'voxel'  # choices: ['range', 'voxel']

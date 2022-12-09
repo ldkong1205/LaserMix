@@ -134,14 +134,17 @@ def train(logger, model, datasets, args, cfg, device):
 
         model.train()
 
-        for idx, (scan, label, _, _) in enumerate(loader_train):
+        # for idx, (scan, label, _, _) in enumerate(loader_train):
+        for idx, data in enumerate(loader_train):
+
+            if cfg.MODEL.MODALITY == 'range':
+                scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)        
+            elif cfg.MODEL.MODALITY == 'voxel':
+                scan, label, fea = data['grid_ind'].to(device), data['voxel_label'].to(device), data['point_feature'].to(device)
 
             optimizer.zero_grad()
             lr = scheduler.get_last_lr()[0]
             bs = scan.size(0)
-            
-            scan  = scan.to(device) # [bs, 6, H, W]
-            label = torch.squeeze(label, axis=1).to(device)  # [bs, H, W]
 
             with torch.cuda.amp.autocast(enabled=args.amp):
 

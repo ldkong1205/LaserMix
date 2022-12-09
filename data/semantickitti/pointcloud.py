@@ -1,5 +1,6 @@
 import os
-import random
+import glob
+
 import numpy as np
 from torch.utils import data
 
@@ -92,14 +93,48 @@ class SemkittiDataset(data.Dataset):
         
         self.lidar_list = []
         for folder in folders:
-            self.lidar_list += absoluteFilePaths('/'.join([self.root, str(folder).zfill(2), 'velodyne']))
-        self.lidar_list.sort()
+            self.lidar_list += glob.glob(self.root + 'sequences/' + folder + '/velodyne/*.bin')
+        self.label_list = [i.replace("velodyne", "labels") for i in self.lidar_list]
+        self.label_list = [i.replace("bin", "label") for i in self.label_list]
+
+        if self.data_split_list_path:
+            self.lidar_list_labeled = [self.root + 'sequences/' + i for i in data_split_list]
+            self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
+            self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
+            print("Loading '{}' labeled samples ('{:.0f}%') from SemanticKITTI under '{}' split ...".format(
+                len(self.lidar_list_labeled), (len(self.lidar_list_labeled) / len(self.label_list)) * 100, self.split)
+            )
+
+            self.lidar_list_unlabeled = [i for i in self.lidar_list if i not in self.lidar_list_labeled]
+            self.label_list_unlabeled = [i.replace("velodyne", "labels") for i in self.lidar_list_unlabeled]
+            self.label_list_unlabeled = [i.replace("bin", "label") for i in self.label_list_unlabeled]
+            print("Loading '{}' unlabeled samples ('{:.0f}%') from SemanticKITTI under '{}' split ...".format(
+                len(self.lidar_list_unlabeled), (len(self.lidar_list_unlabeled) / len(self.label_list)) * 100, self.split)
+            )
+
+            self.lidar_list_labeled = self.lidar_list_labeled * int(np.ceil(len(self.lidar_list_unlabeled) / len(self.lidar_list_labeled)))
+            self.label_list_labeled = [i.replace("velodyne", "labels") for i in self.lidar_list_labeled]
+            self.label_list_labeled = [i.replace("bin", "label") for i in self.label_list_labeled]
+
+            assert len(self.lidar_list_labeled) == len(self.label_list_labeled)
+            assert len(self.lidar_list_unlabeled) == len(self.label_list_unlabeled)
+
+            if self.if_sup_only:
+                self.lidar_list = self.lidar_list_labeled
+                self.label_list = self.label_list_labeled
+            else:
+                self.lidar_list = self.lidar_list_unlabeled
+                self.label_list = self.label_list_unlabeled
+
+        if self.if_scribble:
+            self.label_list = [i.replace("SemanticKITTI", "ScribbleKITTI") for i in self.label_list]
+            self.label_list = [i.replace("labels", "scribbles") for i in self.label_list]
 
     def __len__(self):
         'Denotes the total number of samples'
-        return len(self.sample_idx)
+        return len(self.lidar_list)
     
-    def get_kitti_points_ringID(self, points):
+    def get_kitti_ringID(self, points):
         scan_x = points[:, 0]
         scan_y = points[:, 1]
 
@@ -113,25 +148,21 @@ class SemkittiDataset(data.Dataset):
         return ringID
 
     def __getitem__(self, index):
-        raw_data = np.fromfile(self.lidar_list[index], dtype=np.float32).reshape((-1, 4))
+        scan = np.fromfile(self.lidar_list[index], dtype=np.float32).reshape((-1, 4))
 
         if self.split == 'test':
-            annotated_data = np.expand_dims(np.zeros_like(raw_data[:, 0], dtype=int), axis=1)
+            label = np.expand_dims(np.zeros_like(scan[:, 0], dtype=int), axis=1)
         else:
-
-            annotated_data = np.fromfile(
-                self.lidar_list[index].replace('velodyne', 'labels')[:-3] + 'label',
-                    dtype=np.uint32).reshape((-1, 1)
-                )
-            annotated_data = annotated_data & 0xFFFF
-            annotated_data = np.vectorize(LEARNING_MAP.__getitem__)(annotated_data)
+            label = np.fromfile(self.label_list[index], dtype=np.uint32)
+            label = label & 0xFFFF
+            label = np.vectorize(LEARNING_MAP.__getitem__)(label)
         
-        ringID = self.get_kitti_points_ringID(raw_data).reshape((-1,1))
-        raw_data= np.concatenate([raw_data, ringID.reshape(-1, 1)], axis=1).astype(np.float32)
+        ringID = self.get_kitti_ringID(scan).reshape((-1, 1))
+        scan = np.concatenate([scan, ringID.reshape(-1, 1)], axis=1).astype(np.float32)
         pc_data = {
-            'xyzret': raw_data,
-            'labels': annotated_data.astype(np.uint8),
-            'path': self.lidar_list[index],
+            'scan': scan,
+            'label': label.astype(np.uint8),
+            'name': self.lidar_list[index],
         }
 
         return pc_data

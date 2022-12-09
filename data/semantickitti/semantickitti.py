@@ -1,9 +1,7 @@
-import os
 import cv2
 import glob
 import random
 import yaml
-from typing import Tuple
 from collections import defaultdict
 
 import numba as nb
@@ -151,7 +149,11 @@ class SemkittiRangeViewDatabase(data.Dataset):
 
         scan, label, mask = self.prepare_input_label_semantic_with_mask(data_dict)
 
-        return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
+        return {
+            'scan': F.to_tensor(scan),
+            'label': F.to_tensor(label).to(dtype=torch.long),
+            'name': self.lidar_list[index],
+        }
 
     def prepare_input_label_semantic_with_mask(self, sample):
         scale_x = np.expand_dims(np.ones([self.H, self.W]) * 50.0, axis=-1).astype(np.float32)
@@ -217,6 +219,23 @@ class SemkittiRangeViewDatabase(data.Dataset):
         return depth_map
 
 
+@nb.jit('u1[:,:,:](u1[:,:,:],i8[:,:])', nopython=True, cache=True, parallel=False)
+def nb_process_label(processed_label, sorted_label_voxel_pair):
+    label_size = 256
+    counter = np.zeros((label_size,), dtype=np.uint16)
+    counter[sorted_label_voxel_pair[0, 3]] = 1
+    cur_sear_ind = sorted_label_voxel_pair[0, :3]
+    for i in range(1, sorted_label_voxel_pair.shape[0]):
+        cur_ind = sorted_label_voxel_pair[i, :3]
+        if not np.all(np.equal(cur_ind, cur_sear_ind)):
+            processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
+            counter = np.zeros((label_size,), dtype=np.uint16)
+            cur_sear_ind = cur_ind
+        counter[sorted_label_voxel_pair[i, 3]] += 1
+    processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
+    return processed_label
+
+
 class SemkittiCylinderDatabase(data.Dataset):
     def __init__(
         self,
@@ -224,6 +243,8 @@ class SemkittiCylinderDatabase(data.Dataset):
         split: str,
         data_split: str = None,
         voxel_grid_size: list = [240, 180, 32],
+        max_volume_space: list = [50, 180, 2],
+        min_volume_space: list = [0, -180, -4],
         augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
@@ -231,6 +252,7 @@ class SemkittiCylinderDatabase(data.Dataset):
         super().__init__()
         self.root = root
         self.voxel_grid_size = np.array(voxel_grid_size)
+        self.augment = augment
 
         self.point_cloud_dataset = SemkittiDataset(
             root=self.root,
@@ -247,11 +269,9 @@ class SemkittiCylinderDatabase(data.Dataset):
         else:
             raise NotImplementedError
 
-        
         self.ignore_label = 0
-        self.max_volume_space = [50, 180, 2]
-        self.min_volume_space = [0, -180, -4]
-        self.trans_std = [0.1, 0.1, 0.1]
+        self.max_volume_space = max_volume_space
+        self.min_volume_space = min_volume_space
 
     def __len__(self):
         'Denotes the total number of samples'
@@ -259,9 +279,11 @@ class SemkittiCylinderDatabase(data.Dataset):
 
     def __getitem__(self, index):
         pc_data = self.point_cloud_dataset[index]
-        labels = pc_data['labels']
-        xyz = pc_data['xyzret'][:, :3]
-        re = pc_data['xyzret'][:, 3:5]
+
+        points = pc_data['scan'][:, :3]  # x, y, z
+        intensity = pc_data['scan'][:, 3]  # intensity
+        ring = pc_data['scan'][:, 4]  # ring
+        labels = pc_data['label']
 
         # data aug (drop)
         if self.if_drop:
@@ -271,71 +293,69 @@ class SemkittiCylinderDatabase(data.Dataset):
             self.points_to_drop = np.unique(self.points_to_drop)
             points = np.delete(points, self.points_to_drop, axis=0)
             intensity = np.delete(intensity, self.points_to_drop)
+            ring = np.delete(ring, self.points_to_drop)
+            labels = np.delete(labels, self.points_to_drop)
 
         # data aug (flip)
         if self.if_flip:
             flip_type = np.random.choice(4, 1)
             if flip_type == 1:
-                xyz[:, 0] = -xyz[:, 0]
+                points[:, 0] = -points[:, 0]  # flip x
             elif flip_type == 2:
-                xyz[:, 1] = -xyz[:, 1]
+                points[:, 1] = -points[:, 1]  # flip y
             elif flip_type == 3:
-                xyz[:, :2] = -xyz[:, :2]
+                points[:, :2] = -points[:, :2]  # flip both x and y
         
         # data aug (scale)
         if self.if_scale:
-            noise_scale = np.random.uniform(0.95, 1.05)
-            xyz[:, 0] = noise_scale * xyz[:, 0]
-            xyz[:, 1] = noise_scale * xyz[:, 1]
+            scale = 1.05  # [-5%, +5%]
+            rand_scale = np.random.uniform(1, scale)
+            if np.random.random() < 0.5:
+                rand_scale = 1 / scale
+            points[:, 0] *= rand_scale
+            points[:, 1] *= rand_scale
 
         # data aug (rotate)
         if self.if_rotate:
             rotate_rad = np.deg2rad(np.random.random() * 90) - np.pi / 4
             c, s = np.cos(rotate_rad), np.sin(rotate_rad)
             j = np.matrix([[c, s], [-s, c]])
-            xyz[:, :2] = np.dot(xyz[:, :2], j)
+            points[:, :2] = np.dot(points[:, :2], j)
 
-        if self.transform:
-            noise_translate = np.array([
-                np.random.normal(0, self.trans_std[0], 1),
-                np.random.normal(0, self.trans_std[1], 1),
-                np.random.normal(0, self.trans_std[2], 1)
-            ]).T
+        # data aug (jitter)
+        if self.if_jitter:
+            jitter = 0.1
+            rand_jitter = np.clip(np.random.normal(0, jitter, 3), -3 * jitter, 3 * jitter)
+            points += rand_jitter
 
-            xyz[:, 0:3] += noise_translate
-
-        xyz_pol = self.cart2polar(xyz)
+        xyz_pol = self.cart2polar(points)
+        xyz_pol[:, 1] = xyz_pol[:, 1] / np.pi * 180.0
 
         max_bound = np.asarray(self.max_volume_space)
         min_bound = np.asarray(self.min_volume_space)
 
         crop_range = max_bound - min_bound
-        cur_grid_size = self.grid_size
+        cur_grid_size = self.voxel_grid_size
         intervals = crop_range / (cur_grid_size - 1)
 
-        if (intervals == 0).any():
-            print("Zero interval!")
         grid_ind = (np.floor((np.clip(xyz_pol, min_bound, max_bound) - min_bound) / intervals)).astype(np.int)
 
-        processed_label = np.ones(self.grid_size, dtype=np.uint8) * self.ignore_label
-        label_voxel_pair = np.concatenate([grid_ind, labels], axis=1)
+        processed_label = np.ones(self.voxel_grid_size, dtype=np.uint8) * self.ignore_label
+        label_voxel_pair = np.concatenate([grid_ind, np.expand_dims(labels, axis=-1)], axis=1)
         label_voxel_pair = label_voxel_pair[np.lexsort((grid_ind[:, 0], grid_ind[:, 1], grid_ind[:, 2])), :]
-        processed_label = self.nb_process_label(np.copy(processed_label), label_voxel_pair)
+        processed_label = nb_process_label(np.copy(processed_label), label_voxel_pair)
 
         voxel_centers = (grid_ind.astype(np.float32) + 0.5) * intervals + min_bound
         return_xyz = xyz_pol - voxel_centers
-        return_xyz = np.concatenate((return_xyz, xyz_pol, xyz[:, :2]), axis=1)
-
-        return_fea = np.concatenate((return_xyz, re), axis=1)
-
-        data_dict = {
+        return_xyz = np.concatenate((return_xyz, xyz_pol, points[:, :2]), axis=1)
+        return_fea = np.concatenate((return_xyz, np.expand_dims(intensity, axis=-1), np.expand_dims(ring, axis=-1)), axis=1)
+        
+        return {
             'voxel_label': processed_label,
             'grid_ind': grid_ind,
             'point_label': labels,
             'point_feature': return_fea,
         }
-        
-        return data_dict
 
     def cart2polar(self, input_xyz):
         rho = np.sqrt(input_xyz[:, 0] ** 2 + input_xyz[:, 1] ** 2)
@@ -347,38 +367,23 @@ class SemkittiCylinderDatabase(data.Dataset):
         y = input_xyz_polar[0] * np.sin(input_xyz_polar[1])
         return np.stack((x, y, input_xyz_polar[2]), axis=0)
 
-    @nb.jit('u1[:,:,:](u1[:,:,:],i8[:,:])', nopython=True, cache=True, parallel=False)
-    def nb_process_label(processed_label, sorted_label_voxel_pair):
-        label_size = 256
-        counter = np.zeros((label_size,), dtype=np.uint16)
-        counter[sorted_label_voxel_pair[0, 3]] = 1
-        cur_sear_ind = sorted_label_voxel_pair[0, :3]
-        for i in range(1, sorted_label_voxel_pair.shape[0]):
-            cur_ind = sorted_label_voxel_pair[i, :3]
-            if not np.all(np.equal(cur_ind, cur_sear_ind)):
-                processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
-                counter = np.zeros((label_size,), dtype=np.uint16)
-                cur_sear_ind = cur_ind
-            counter[sorted_label_voxel_pair[i, 3]] += 1
-        processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
-        return processed_label
+    # @staticmethod
+    # def collate_batch(batch_list):
+    #     data_dict = defaultdict(list)
+    #     for cur_sample in batch_list:
+    #         for key, val in cur_sample.items():
+    #             data_dict[key].append(val)
+    #     batch_size = len(batch_list)
+    #     ret = {}
+    #     ret['voxel_label'] = torch.from_numpy(np.stack(data_dict['voxel_label']).astype(np.int))
 
-    @staticmethod
-    def collate_batch(batch_list):
-        data_dict = defaultdict(list)
-        for cur_sample in batch_list:
-            for key, val in cur_sample.items():
-                data_dict[key].append(val)
-        batch_size = len(batch_list)
-        ret = {}
-        ret['voxel_label'] = torch.from_numpy(np.stack(data_dict['voxel_label']).astype(np.int))
+    #     grid_ind = []
+    #     for i_batch in range(batch_size):
+    #         grid_ind.append(
+    #             np.pad(data_dict['grid_ind'][i_batch], ((0, 0), (1, 0)), mode='constant', constant_values=i_batch)
+    #         )
+    #     ret['grid_ind'] = torch.from_numpy(np.concatenate(grid_ind))
+    #     ret['point_label'] = torch.from_numpy(np.concatenate(data_dict['point_label']))
+    #     ret['point_feature'] = torch.from_numpy(np.concatenate(data_dict['point_feature'])).type(torch.FloatTensor)
 
-        grid_ind = []
-        for i_batch in range(batch_size):
-            grid_ind.append(
-                np.pad(data_dict['grid_ind'][i_batch], ((0, 0), (1, 0)), mode='constant', constant_values=i_batch))
-        ret['grid_ind'] = torch.from_numpy(np.concatenate(grid_ind))
-        ret['point_label'] = torch.from_numpy(np.concatenate(data_dict['point_label']))
-        ret['point_feature'] = torch.from_numpy(np.concatenate(data_dict['point_feature'])).type(torch.FloatTensor)
-
-        return ret
+    #     return ret

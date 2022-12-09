@@ -124,15 +124,17 @@ def main():
             from data.semantickitti.semantickitti import SemkittiRangeViewDatabase
             datasets = [
                 SemkittiRangeViewDatabase(
-                    args.root_semkitti, 'train', (args.H, args.W),
+                    args.root_semkitti, 'train',
                     data_split=cfg.DATA.SPLIT,
+                    range_img_size=(args.H, args.W),
                     augment='GlobalAugment',
                     if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
                 ),
                 SemkittiRangeViewDatabase(
-                    args.root_semkitti, 'val', (args.H, args.W),
+                    args.root_semkitti, 'val',
                     data_split='full',
+                    range_img_size=(args.H, args.W),
                     augment='NoAugment',
                     if_scribble=False,
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
@@ -140,14 +142,28 @@ def main():
             ]
         elif cfg.MODEL.MODALITY == 'voxel':
             from data.semantickitti.semantickitti import SemkittiCylinderDatabase
-            dataset = \
+            datasets = [
                 SemkittiCylinderDatabase(
                     args.root_semkitti, 'train', 
                     data_split=cfg.DATA.SPLIT,
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                    max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
+                    min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
                     augment='GlobalAugment',
                     if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
-                )
+                ),
+                SemkittiCylinderDatabase(
+                    args.root_semkitti, 'val', 
+                    data_split='full',
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                    max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
+                    min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
+                    augment='NoAugment',
+                    if_scribble=False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                ),
+            ]
         else:
             raise NotImplementedError
 
