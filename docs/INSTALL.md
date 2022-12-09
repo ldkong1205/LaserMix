@@ -46,9 +46,14 @@ pip install nuscenes-devkit
 conda install pytorch-scatter -c pyg
 ```
 
-#### 4.x - Other Packages
+#### 4.3 - [SparseConv](https://github.com/traveller59/spconv)
 ```
-pip install pyyaml easydict spconv_cu113 numba
+pip install spconv_cu113
+```
+
+#### 4.4 - Other Packages
+```
+pip install pyyaml easydict numba
 ```
 
 
