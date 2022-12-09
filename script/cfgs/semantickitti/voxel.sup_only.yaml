@@ -11,9 +11,9 @@ MODEL:
     MODALITY: 'voxel'  # choices: ['range', 'voxel']
     BACKBONE: 'cylinder3d'  # choices: ['cylinder3d']
     RESOLUTION:
-        NUSCENES: [240, 180, 20]
-        SEMANTICKITTI: [240, 180, 20]
-        SCRIBBLEKITTI: [240, 180, 20]
+        NUSCENES: [240, 180, 32]
+        SEMANTICKITTI: [240, 180, 32]
+        SCRIBBLEKITTI: [240, 180, 32]
     NUM_IN_FEA: 32
     INIT_SIZE: 16
 

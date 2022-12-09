@@ -119,24 +119,38 @@ def main():
         ]
     
     elif cfg.DATA.DATASET == 'semantickitti' or cfg.DATA.DATASET == 'scribblekitti':
-        from data.semantickitti.semantickitti import SemkittiLidarSegDatabase
 
-        datasets = [
-            SemkittiLidarSegDatabase(
-                args.root_semkitti, 'train', (args.H, args.W),
-                data_split=cfg.DATA.SPLIT,
-                augment='GlobalAugment',
-                if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
-                if_sup_only=cfg.DATA.IF_SUP_ONLY,
-            ),
-            SemkittiLidarSegDatabase(
-                args.root_semkitti, 'val', (args.H, args.W),
-                data_split='full',
-                augment='NoAugment',
-                if_scribble=False,
-                if_sup_only=cfg.DATA.IF_SUP_ONLY,
-            ),
-        ]
+        if cfg.MODEL.MODALITY == 'range':
+            from data.semantickitti.semantickitti import SemkittiRangeViewDatabase
+            datasets = [
+                SemkittiRangeViewDatabase(
+                    args.root_semkitti, 'train', (args.H, args.W),
+                    data_split=cfg.DATA.SPLIT,
+                    augment='GlobalAugment',
+                    if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                ),
+                SemkittiRangeViewDatabase(
+                    args.root_semkitti, 'val', (args.H, args.W),
+                    data_split='full',
+                    augment='NoAugment',
+                    if_scribble=False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                ),
+            ]
+        elif cfg.MODEL.MODALITY == 'voxel':
+            from data.semantickitti.semantickitti import SemkittiCylinderDatabase
+            dataset = \
+                SemkittiCylinderDatabase(
+                    args.root_semkitti, 'train', 
+                    data_split=cfg.DATA.SPLIT,
+                    augment='GlobalAugment',
+                    if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                )
+        else:
+            raise NotImplementedError
+
     
     else:
         raise NotImplementedError

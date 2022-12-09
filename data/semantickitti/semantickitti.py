@@ -4,23 +4,25 @@ import glob
 import random
 import yaml
 from typing import Tuple
+from collections import defaultdict
 
+import numba as nb
 import numpy as np
 import torch
 from torch.utils import data
 from torchvision.transforms import functional as F
 
 from data.semantickitti.laserscan import SemLaserScan
+from data.semantickitti.pointcloud import SemkittiDataset
 
 
-class SemkittiLidarSegDatabase(data.Dataset):
-    
+class SemkittiRangeViewDatabase(data.Dataset):
     def __init__(
         self,
         root: str,
         split: str,
-        range_img_size: tuple = (64, 1920),
         data_split: str = None,
+        range_img_size: tuple = (64, 1920),
         augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
@@ -78,9 +80,14 @@ class SemkittiLidarSegDatabase(data.Dataset):
                 data_split_list = f.read().splitlines()
             data_split_list = [i.split('train/')[-1] for i in data_split_list]
 
-        if self.split == 'train': folders = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
-        elif self.split == 'val': folders = ['08']
-        elif self.split == 'test': folders = ['11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
+        if self.split == 'train':
+            folders = ['00', '01', '02', '03', '04', '05', '06', '07', '09', '10']
+        elif self.split == 'val':
+            folders = ['08']
+        elif self.split == 'test':
+            folders = ['11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21']
+        else:
+            raise NotImplementedError
 
         self.lidar_list = []
         for folder in folders:
@@ -121,7 +128,6 @@ class SemkittiLidarSegDatabase(data.Dataset):
             self.label_list = [i.replace("SemanticKITTI", "ScribbleKITTI") for i in self.label_list]
             self.label_list = [i.replace("labels", "scribbles") for i in self.label_list]
 
-
     def __len__(self):
         return len(self.lidar_list)
 
@@ -147,85 +153,6 @@ class SemkittiLidarSegDatabase(data.Dataset):
 
         return F.to_tensor(scan), F.to_tensor(label).to(dtype=torch.long), F.to_tensor(mask), self.lidar_list[index]
 
-
-    def InstMix(
-        self,
-        scan: np.ndarray, label: np.ndarray, mask: np.ndarray,
-        scan_: np.ndarray, label_: np.ndarray, mask_: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        scan_new = scan.copy()
-        label_new = label.copy()
-        mask_new = mask.copy()
-
-        pix_bicycle = label_ == 2  # cls: 2 (bicycle)
-        if np.sum(pix_bicycle) > 20:
-            scan_new[pix_bicycle]  = scan_[pix_bicycle]
-            label_new[pix_bicycle] = label_[pix_bicycle]
-            mask_new[pix_bicycle]  = mask_[pix_bicycle]
-        
-        pix_motorcycle = label_ == 3  # cls: 3 (motorcycle)
-        if np.sum(pix_motorcycle) > 20:
-            scan_new[pix_motorcycle]  = scan_[pix_motorcycle]
-            label_new[pix_motorcycle] = label_[pix_motorcycle]
-            mask_new[pix_motorcycle]  = mask_[pix_motorcycle]
-
-        pix_truck = label_ == 4  # cls: 4 (truck)
-        if np.sum(pix_truck) > 20:
-            scan_new[pix_truck]  = scan_[pix_truck]
-            label_new[pix_truck] = label_[pix_truck]
-            mask_new[pix_truck]  = mask_[pix_truck]
-
-        pix_other_vehicle = label_ == 5  # cls: 5 (other-vehicle)
-        if np.sum(pix_other_vehicle) > 20:
-            scan_new[pix_other_vehicle]  = scan_[pix_other_vehicle]
-            label_new[pix_other_vehicle] = label_[pix_other_vehicle]
-            mask_new[pix_other_vehicle]  = mask_[pix_other_vehicle]
-
-        pix_person = label_ == 6  # cls: 6 (person)
-        if np.sum(pix_person) > 20:
-            scan_new[pix_person]  = scan_[pix_person]
-            label_new[pix_person] = label_[pix_person]
-            mask_new[pix_person]  = mask_[pix_person]
-
-        pix_bicyclist = label_ == 7  # cls: 7 (bicyclist)
-        if np.sum(pix_bicyclist) > 20:
-            scan_new[pix_bicyclist]  = scan_[pix_bicyclist]
-            label_new[pix_bicyclist] = label_[pix_bicyclist]
-            mask_new[pix_bicyclist]  = mask_[pix_bicyclist]
-
-        pix_motorcyclist = label_ == 8  # cls: 8 (motorcyclist)
-        if np.sum(pix_motorcyclist) > 20:
-            scan_new[pix_motorcyclist]  = scan_[pix_motorcyclist]
-            label_new[pix_motorcyclist] = label_[pix_motorcyclist]
-            mask_new[pix_motorcyclist]  = mask_[pix_motorcyclist]
-
-        pix_other_ground = label_ == 12  # cls: 12 (other-ground)
-        if np.sum(pix_other_ground) > 20:
-            scan_new[pix_other_ground]  = scan_[pix_other_ground]
-            label_new[pix_other_ground] = label_[pix_other_ground]
-            mask_new[pix_other_ground]  = mask_[pix_other_ground]
-
-        pix_other_trunk = label_ == 16  # cls: 16 (trunk)
-        if np.sum(pix_other_trunk) > 20:
-            scan_new[pix_other_trunk]  = scan_[pix_other_trunk]
-            label_new[pix_other_trunk] = label_[pix_other_trunk]
-            mask_new[pix_other_trunk]  = mask_[pix_other_trunk]
-        
-        pix_pole = label_ == 18  # cls: 18 (pole)
-        if np.sum(pix_pole) > 20:
-            scan_new[pix_pole]  = scan_[pix_pole]
-            label_new[pix_pole] = label_[pix_pole]
-            mask_new[pix_pole]  = mask_[pix_pole]
-
-        pix_traffic_sign = label_ == 19  # cls: 19 (traffic-sign)
-        if np.sum(pix_traffic_sign) > 20:
-            scan_new[pix_traffic_sign]  = scan_[pix_traffic_sign]
-            label_new[pix_traffic_sign] = label_[pix_traffic_sign]
-            mask_new[pix_traffic_sign]  = mask_[pix_traffic_sign]
-
-        return scan_new, label_new, mask_new
-
-
     def prepare_input_label_semantic_with_mask(self, sample):
         scale_x = np.expand_dims(np.ones([self.H, self.W]) * 50.0, axis=-1).astype(np.float32)
         scale_y = np.expand_dims(np.ones([self.H, self.W]) * 50.0, axis=-1).astype(np.float32)
@@ -245,7 +172,6 @@ class SemkittiLidarSegDatabase(data.Dataset):
 
         return input_tensor, semantic_label, semantic_label_mask
 
-
     def sample_transform(self, dataset_dict, split_point):
         dataset_dict['xyz'] = np.concatenate(
             [dataset_dict['xyz'][:, split_point:, :], dataset_dict['xyz'][:, :split_point, :]], axis=1
@@ -264,20 +190,17 @@ class SemkittiLidarSegDatabase(data.Dataset):
         )
         return dataset_dict
 
-
     def sem_label_transform(self, raw_label_map: np.ndarray):
         for i in self.label_transfer_dict.keys():
             raw_label_map[raw_label_map==i] = self.label_transfer_dict[i]
         
         return raw_label_map
 
-
     def generate_label(self, semantic_label: np.ndarray):
         original_label = np.copy(semantic_label)
         label_new = self.sem_label_transform(original_label)
         
         return label_new
-
 
     def fill_spherical(self, range_image: np.ndarray):
         height, width = np.shape(range_image)[:2]
@@ -292,10 +215,170 @@ class SemkittiLidarSegDatabase(data.Dataset):
         depth_map = range_image * with_value + depth_map * (1 - with_value)
         
         return depth_map
-                   
 
-def absoluteFilePaths(directory):
-    for dirpath, _, filenames in os.walk(directory):
-        filenames.sort()
-        for f in filenames:
-            yield os.path.abspath(os.path.join(dirpath, f))
+
+class SemkittiCylinderDatabase(data.Dataset):
+    def __init__(
+        self,
+        root: str,
+        split: str,
+        data_split: str = None,
+        voxel_grid_size: list = [240, 180, 32],
+        augment: str = 'NoAugment',
+        if_scribble: bool = False,
+        if_sup_only: bool = False,
+    ):
+        super().__init__()
+        self.root = root
+        self.voxel_grid_size = np.array(voxel_grid_size)
+
+        self.point_cloud_dataset = SemkittiDataset(
+            root=self.root,
+            split=split,
+            data_split=data_split,
+            if_scribble=if_scribble,
+            if_sup_only=if_sup_only,
+        )
+
+        if self.augment == 'GlobalAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = True, True, True, True, True
+        elif self.augment == 'NoAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, False, False, False, False
+        else:
+            raise NotImplementedError
+
+        
+        self.ignore_label = 0
+        self.max_volume_space = [50, 180, 2]
+        self.min_volume_space = [0, -180, -4]
+        self.trans_std = [0.1, 0.1, 0.1]
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.point_cloud_dataset)
+
+    def __getitem__(self, index):
+        pc_data = self.point_cloud_dataset[index]
+        labels = pc_data['labels']
+        xyz = pc_data['xyzret'][:, :3]
+        re = pc_data['xyzret'][:, 3:5]
+
+        # data aug (drop)
+        if self.if_drop:
+            max_num_drop = int(len(points) * 0.1)  # drop ~10%
+            num_drop = np.random.randint(low=0, high=max_num_drop)
+            self.points_to_drop = np.random.randint(low=0, high=len(points)-1, size=num_drop)
+            self.points_to_drop = np.unique(self.points_to_drop)
+            points = np.delete(points, self.points_to_drop, axis=0)
+            intensity = np.delete(intensity, self.points_to_drop)
+
+        # data aug (flip)
+        if self.if_flip:
+            flip_type = np.random.choice(4, 1)
+            if flip_type == 1:
+                xyz[:, 0] = -xyz[:, 0]
+            elif flip_type == 2:
+                xyz[:, 1] = -xyz[:, 1]
+            elif flip_type == 3:
+                xyz[:, :2] = -xyz[:, :2]
+        
+        # data aug (scale)
+        if self.if_scale:
+            noise_scale = np.random.uniform(0.95, 1.05)
+            xyz[:, 0] = noise_scale * xyz[:, 0]
+            xyz[:, 1] = noise_scale * xyz[:, 1]
+
+        # data aug (rotate)
+        if self.if_rotate:
+            rotate_rad = np.deg2rad(np.random.random() * 90) - np.pi / 4
+            c, s = np.cos(rotate_rad), np.sin(rotate_rad)
+            j = np.matrix([[c, s], [-s, c]])
+            xyz[:, :2] = np.dot(xyz[:, :2], j)
+
+        if self.transform:
+            noise_translate = np.array([
+                np.random.normal(0, self.trans_std[0], 1),
+                np.random.normal(0, self.trans_std[1], 1),
+                np.random.normal(0, self.trans_std[2], 1)
+            ]).T
+
+            xyz[:, 0:3] += noise_translate
+
+        xyz_pol = self.cart2polar(xyz)
+
+        max_bound = np.asarray(self.max_volume_space)
+        min_bound = np.asarray(self.min_volume_space)
+
+        crop_range = max_bound - min_bound
+        cur_grid_size = self.grid_size
+        intervals = crop_range / (cur_grid_size - 1)
+
+        if (intervals == 0).any():
+            print("Zero interval!")
+        grid_ind = (np.floor((np.clip(xyz_pol, min_bound, max_bound) - min_bound) / intervals)).astype(np.int)
+
+        processed_label = np.ones(self.grid_size, dtype=np.uint8) * self.ignore_label
+        label_voxel_pair = np.concatenate([grid_ind, labels], axis=1)
+        label_voxel_pair = label_voxel_pair[np.lexsort((grid_ind[:, 0], grid_ind[:, 1], grid_ind[:, 2])), :]
+        processed_label = self.nb_process_label(np.copy(processed_label), label_voxel_pair)
+
+        voxel_centers = (grid_ind.astype(np.float32) + 0.5) * intervals + min_bound
+        return_xyz = xyz_pol - voxel_centers
+        return_xyz = np.concatenate((return_xyz, xyz_pol, xyz[:, :2]), axis=1)
+
+        return_fea = np.concatenate((return_xyz, re), axis=1)
+
+        data_dict = {
+            'voxel_label': processed_label,
+            'grid_ind': grid_ind,
+            'point_label': labels,
+            'point_feature': return_fea,
+        }
+        
+        return data_dict
+
+    def cart2polar(self, input_xyz):
+        rho = np.sqrt(input_xyz[:, 0] ** 2 + input_xyz[:, 1] ** 2)
+        phi = np.arctan2(input_xyz[:, 1], input_xyz[:, 0])
+        return np.stack((rho, phi, input_xyz[:, 2]), axis=1)
+
+    def polar2cat(self, input_xyz_polar):
+        x = input_xyz_polar[0] * np.cos(input_xyz_polar[1])
+        y = input_xyz_polar[0] * np.sin(input_xyz_polar[1])
+        return np.stack((x, y, input_xyz_polar[2]), axis=0)
+
+    @nb.jit('u1[:,:,:](u1[:,:,:],i8[:,:])', nopython=True, cache=True, parallel=False)
+    def nb_process_label(processed_label, sorted_label_voxel_pair):
+        label_size = 256
+        counter = np.zeros((label_size,), dtype=np.uint16)
+        counter[sorted_label_voxel_pair[0, 3]] = 1
+        cur_sear_ind = sorted_label_voxel_pair[0, :3]
+        for i in range(1, sorted_label_voxel_pair.shape[0]):
+            cur_ind = sorted_label_voxel_pair[i, :3]
+            if not np.all(np.equal(cur_ind, cur_sear_ind)):
+                processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
+                counter = np.zeros((label_size,), dtype=np.uint16)
+                cur_sear_ind = cur_ind
+            counter[sorted_label_voxel_pair[i, 3]] += 1
+        processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
+        return processed_label
+
+    @staticmethod
+    def collate_batch(batch_list):
+        data_dict = defaultdict(list)
+        for cur_sample in batch_list:
+            for key, val in cur_sample.items():
+                data_dict[key].append(val)
+        batch_size = len(batch_list)
+        ret = {}
+        ret['voxel_label'] = torch.from_numpy(np.stack(data_dict['voxel_label']).astype(np.int))
+
+        grid_ind = []
+        for i_batch in range(batch_size):
+            grid_ind.append(
+                np.pad(data_dict['grid_ind'][i_batch], ((0, 0), (1, 0)), mode='constant', constant_values=i_batch))
+        ret['grid_ind'] = torch.from_numpy(np.concatenate(grid_ind))
+        ret['point_label'] = torch.from_numpy(np.concatenate(data_dict['point_label']))
+        ret['point_feature'] = torch.from_numpy(np.concatenate(data_dict['point_feature'])).type(torch.FloatTensor)
+
+        return ret
