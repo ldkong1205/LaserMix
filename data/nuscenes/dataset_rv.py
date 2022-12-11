@@ -68,7 +68,11 @@ class LidarSegRangeViewDataset(data.Dataset):
         token = self.db.tokens[index]
         rv, label_rv, idx_rv = self.pull_item(token)
 
-        return rv, label_rv, idx_rv, token
+        return {
+            'scan': rv,
+            'label': label_rv,
+            'name': idx_rv,
+        }
 
     
     def RangePaste(self, rv, label_rv, rv_, label_rv_):

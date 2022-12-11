@@ -36,11 +36,18 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
     # val steps start here
     with torch.no_grad():
 
-        for idx, (scan, label, _, _) in enumerate(loader_val):
+        for idx, data in enumerate(loader_val):
 
-            bs = scan.size(0)
-            scan  = scan.to(device)  # [bs, 6, H, W]
-            label = torch.squeeze(label, axis=1).to(device)  # [bs, H, W]
+            if cfg.MODEL.MODALITY == 'range':
+                scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)
+                bs = scan.size(0)
+
+            elif cfg.MODEL.MODALITY == 'voxel':
+                scan, label, p_fea, _ = data
+                scan = [torch.from_numpy(i).to(device) for i in scan]  # [N, 3]
+                label = label.type(torch.LongTensor).to(device)  # [bs, 480, 360, 32]
+                p_fea = [torch.from_numpy(i).type(torch.FloatTensor).to(device) for i in p_fea]
+                bs = len(scan)
 
             with torch.cuda.amp.autocast(enabled=args.amp):
 

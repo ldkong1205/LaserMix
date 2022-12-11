@@ -4,7 +4,7 @@ SUFFIX: '_cenet'
 
 DATA:
     DATASET: 'nuscenes'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
-    SPLIT: '20pct'  # choices: ['1pct', '10pct', '20pct', '50pct', 'full']
+    SPLIT: '50pct'  # choices: ['1pct', '10pct', '20pct', '50pct', 'full']
     IF_SUP_ONLY: True
 
 MODEL:
@@ -16,7 +16,7 @@ MODEL:
         SCRIBBLEKITTI: [64, 1920]
 
 TRAIN:
-    NUM_EPOCHS: 75  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
+    NUM_EPOCHS: 100  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
     BATCH_SIZE: 32
     NUM_WORKERS: 8
 
@@ -31,7 +31,7 @@ OPTIM:
     IF_BD_LOSS: True
     TOP_K_PERCENT_PIXELS: 1.0
     OPTIMIZER: 'adamw'  # choices: ['adamw', 'sgd']
-    LEARNING_RATE: 0.0025
+    LEARNING_RATE: 0.01
     SCHEDULER: 'onecycle'  # choices: ['onecycle', 'step']
 
 GENERAL:
