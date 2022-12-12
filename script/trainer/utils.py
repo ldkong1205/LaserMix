@@ -302,21 +302,24 @@ def lovasz_softmax_flat(probas, labels, classes='present'):
 
 
 def flatten_probas(probas, labels, ignore=None):
-    """
-    Flattens predictions in the batch
-    """
     if probas.dim() == 3:
-        # assumes output of a sigmoid layer
         B, H, W = probas.size()
         probas = probas.view(B, 1, H, W)
+    elif probas.dim() == 5:
+        B, C, L, H, W = probas.size()
+        probas = probas.contiguous().view(B, C, L, H*W)
+    
     B, C, H, W = probas.size()
     probas = probas.permute(0, 2, 3, 1).contiguous().view(-1, C)  # B * H * W, C = P, C
     labels = labels.view(-1)
+
     if ignore is None:
         return probas, labels
+    
     valid = (labels != ignore)
     vprobas = probas[torch.squeeze(torch.nonzero(valid))]
     vlabels = labels[valid]
+
     return vprobas, vlabels
 
 
