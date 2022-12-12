@@ -351,7 +351,7 @@ class asymm_3d_spconv(nn.Module):
     def __init__(
         self,
         nclasses: int,
-        output_shape: list = [240, 180, 20],
+        output_shape: list = [480, 360, 32],
         num_input_features: int = 32,
         n_height: int = 32,
         init_size: int = 16,
@@ -360,7 +360,7 @@ class asymm_3d_spconv(nn.Module):
         self.nclasses = nclasses
         self.nheight = n_height  # 32
         self.strict = False
-        self.sparse_shape = np.array(output_shape)  # [240, 180, 20]
+        self.sparse_shape = np.array(output_shape)  # [480, 360, 32]
 
         self.downCntx = ResContextBlock(num_input_features, init_size, indice_key="pre")
         
@@ -383,7 +383,7 @@ class asymm_3d_spconv(nn.Module):
 
         ret = spconv.SparseConvTensor(
             voxel_features, coors, self.sparse_shape, batch_size
-        )  # [uniq, 16], [uniq, 4], (3,), bs -> [240, 180, 32]
+        )  # [uniq, 16], [uniq, 4], (3,), bs -> [480, 360, 32]
         ret = self.downCntx(ret)  # [480, 360, 32]
         
         down1c, down1b = self.resBlock2(ret)     # [240, 180, 16], [480, 360, 32]
