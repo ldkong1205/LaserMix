@@ -87,7 +87,7 @@ cd ..
 pip install ./torchsparse
 ```
 
-- It takes a while to build wheels. After successfully Building `torchsparse`, you should see the following:
+- It takes a while to build wheels. After successfully building `torchsparse`, you should see the following:
 ```
 Successfully built torchsparse
 Installing collected packages: torchsparse
