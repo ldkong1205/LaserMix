@@ -78,14 +78,13 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 
 ## Video Demo
-<p>
-<a href="https://www.youtube.com/watch?v=LKzBqtmxXLg">
-<img width="80%" src="figs/demo-cover.png">
-</a>
-</p>
+| Demo 1 | Demo 2| Demo 3 | 
+| :-: | :-: | :-: |
+| <img width="99%" src="figs/demo1.png"> |  <img width="99%" src="figs/demo2.png"> |  <img width="99%" src="figs/demo3.png"> | 
+| [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: |
 
 
-## Main Results
+## Main Result
 ### Framework Overview
 
 <p align="center">
@@ -176,24 +175,11 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 - [x] Initial release. :rocket:
 - [x] Add license. See [here](#license) for more details.
-- [x] Add visualization video. :movie_camera:
-- [ ] Add demo at Hugging Face Spaces. :hugs:
-- [ ] Add installation details.
-- [ ] Add data preparation details.
+- [x] Add video demos :movie_camera:
+- [x] Add installation details.
+- [x] Add data preparation details.
 - [ ] Add evaluation details.
 - [ ] Add training details.
-
-
-## License
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
-<br />
-This work is under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
-
-
-## Acknowledgement
-We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>8</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>9</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>10</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>11</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>12</sup>[CBST](https://github.com/yzou2/CBST), <sup>13</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>14</sup>[Cityscapes](https://www.cityscapes-dataset.com).
-
-We would like to thank <a href="https://hongfz16.github.io/" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
 
 
 ## Citation
@@ -208,4 +194,18 @@ If you find this work helpful, please kindly consider citing our paper:
   year={2022},
 }
 ```
+
+
+## License
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>
+<br />
+This work is under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+
+
+## Acknowledgement
+We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>8</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>9</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>10</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>11</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>12</sup>[CBST](https://github.com/yzou2/CBST), <sup>13</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>14</sup>[Cityscapes](https://www.cityscapes-dataset.com).
+
+We would like to thank <a href="https://hongfz16.github.io/" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
+
+
 
