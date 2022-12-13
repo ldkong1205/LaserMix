@@ -1,4 +1,4 @@
-<img src="../figs/logo.png" align="right" width="20%">
+<img src="../docs/figs/logo.png" align="right" width="20%">
 
 # Installation
 
@@ -16,8 +16,8 @@ For the **voxel option**, we use a more compact version of [Cylinder3D](https://
 
 #### Requirements
 - [torch-scatter](https://github.com/rusty1s/pytorch_scatter)
-- [spconv](https://github.com/traveller59/spconv/tree/v1.2.1) (v1.2.1)
-- [pybind11](https://github.com/pybind/pybind11/tree/085a29436a8c472caaaf7157aa644b571079bcaa)
+- [spconv](https://github.com/traveller59/spconv/tree/v1.2.1) (cu113)
+- [torchsparse](https://github.com/mit-han-lab/torchsparse)
 
 
 ### Step 1: Create Enviroment
@@ -51,7 +51,52 @@ conda install pytorch-scatter -c pyg
 pip install spconv_cu113
 ```
 
-#### 4.4 - Other Packages
+#### 4.4 - [TorchSparse](https://github.com/mit-han-lab/torchsparse)
+:cactus: **Note:** This package is needed in order to use the `voxel` backbones in this codebase.
+
+- Make a directory named `torchsparse_dir`
+```
+cd package/
+mkdir torchsparse_dir/
+```
+
+- Unzip the `.zip` files in `package/`
+```
+unzip sparsehash.zip
+unzip torchsparse.zip
+
+mv sparsehash-master/ sparsehash/
+mv torchsparse-master/ torchsparse/
+```
+
+- Setup `sparsehash` (Note that `$ROOT` is your home path to the LaserMix folder)
+```
+cd sparsehash/
+./configure --prefix=/$ROOT/LaserMix/package/torchsparse_dir/SparsehasH/
+```
+```
+make
+```
+```
+make install
+```
+
+- Compile `torchsparse`
+```
+cd ..
+pip install ./torchsparse
+```
+
+- It takes a while to build wheels. After successfully Building `torchsparse`, you should see the following:
+```
+Successfully built torchsparse
+Installing collected packages: torchsparse
+Successfully installed torchsparse-2.0.0b0
+```
+
+
+
+#### 4.5 - Other Packages
 ```
 pip install pyyaml easydict numba
 ```
