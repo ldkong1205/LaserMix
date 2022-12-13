@@ -40,7 +40,7 @@ To install the [SemanticKITTI](http://semantic-kitti.org/index) dataset, downloa
 
 ```
 └── semantickitti  
-    └── dataset
+    └── sequences
         ├── velodyne <- contains the .bin files; a .bin file contains the points in a point cloud
         │    └── 00
         │    └── ···
@@ -63,7 +63,7 @@ To install the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, downlo
 
 ```
 └── scribblekitti 
-    └── dataset
+    └── sequences
         └── scribbles <- contains the .label files; a .label file contains the scribble labels of the points in a point cloud
              └── 00
              └── ···
