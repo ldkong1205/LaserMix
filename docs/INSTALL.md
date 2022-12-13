@@ -36,7 +36,8 @@ conda install pytorch==1.11.0 torchvision==0.12.0 cudatoolkit=11.3 -c pytorch
 ```
 
 ### Step 4: Install Necessary Libraries
-#### 4.1 - [nuScenes devkit](https://github.com/nutonomy/nuscenes-devkit) :oncoming_automobile:
+#### 4.1 - [nuScenes devkit](https://github.com/nutonomy/nuscenes-devkit)
+:oncoming_automobile: **Note:** This toolkit is **required** in order to run experiments on the [nuScenes](https://www.nuscenes.org/nuscenes) dataset.
 ```
 pip install nuscenes-devkit 
 ```
@@ -52,7 +53,7 @@ pip install spconv_cu113
 ```
 
 #### 4.4 - [TorchSparse](https://github.com/mit-han-lab/torchsparse)
-:cactus: **Note:** This package is needed in order to use the `voxel` backbones in this codebase.
+:cactus: **Note:** The following steps are **required** in order to use the `voxel` backbones in this codebase.
 
 - Make a directory named `torchsparse_dir`
 ```
@@ -69,10 +70,10 @@ mv sparsehash-master/ sparsehash/
 mv torchsparse-master/ torchsparse/
 ```
 
-- Setup `sparsehash` (Note that `$ROOT` is your home path to the LaserMix folder)
+- Setup `sparsehash` (Note that `${ROOT}` is your home path to the LaserMix folder)
 ```
 cd sparsehash/
-./configure --prefix=/$ROOT/LaserMix/package/torchsparse_dir/SparsehasH/
+./configure --prefix=/${ROOT}/LaserMix/package/torchsparse_dir/SparsehasH/
 ```
 ```
 make
