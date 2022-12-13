@@ -90,9 +90,9 @@ def train(logger, model, datasets, args, cfg, device):
     
     if cfg.OPTIM.LOSS == 'wce':
         weight = torch.tensor(ClassWeightSemikitti.get_weight()).to(device)
-        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=weight).to(device)
+        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=weight, ignore_index=0).to(device)
     elif cfg.OPTIM.LOSS == 'dice':
-        WCE = CrossEntropyDiceLoss(reduction='none', weight=None).to(device)
+        WCE = CrossEntropyDiceLoss(reduction='none', weight=None, ignore_index=0).to(device)
     else:
         raise NotImplementedError
     

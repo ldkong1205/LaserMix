@@ -17,7 +17,7 @@ MODEL:
         SEMANTICKITTI: [480, 360, 32]
         SCRIBBLEKITTI: [480, 360, 32]
     NUM_IN_FEA: 16
-    INIT_SIZE: 16
+    INIT_SIZE: 16  # 32
 
 TRAIN:
     NUM_EPOCHS: 20  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
