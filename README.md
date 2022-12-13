@@ -1,6 +1,6 @@
 <br />
 <p align="center">
-  <img src="figs/logo.png" align="center" width="30%">
+  <img src="docs/figs/logo.png" align="center" width="30%">
 
   
   <h3 align="center"><strong>LaserMix for Semi-Supervised LiDAR Semantic Segmentation</strong></h3>
@@ -35,7 +35,7 @@
 
 <br>
 <p align="center">
-  <img src="figs/laser.png" align="center" width="50%">
+  <img src="docs/figs/laser.png" align="center" width="50%">
   <br>
   Fig. Illustration for laser beam partition based on inclination &phi;.
 </p>
@@ -80,7 +80,7 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 ## Video Demo
 | Demo 1 | Demo 2| Demo 3 | 
 | :-: | :-: | :-: |
-| <img width="99%" src="figs/demo1.png"> |  <img width="99%" src="figs/demo2.png"> |  <img width="99%" src="figs/demo3.png"> | 
+| <img width="99%" src="docs/figs/demo1.png"> |  <img width="99%" src="docs/figs/demo2.png"> |  <img width="99%" src="docs/figs/demo3.png"> | 
 | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: |
 
 
@@ -88,7 +88,7 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 ### Framework Overview
 
 <p align="center">
-  <img src="figs/framework.png" align="center" width="99.9%">
+  <img src="docs/figs/framework.png" align="center" width="99.9%">
 </p>
 
 
@@ -163,12 +163,12 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 ### Ablation Studies
 
 <p align="center">
-  <img src="figs/ablation.png" align="center" width="99.9%">
+  <img src="docs/figs/ablation.png" align="center" width="99.9%">
 </p>
 
 ### Qualitative Examples
 
-![qualitative](figs/qualitative.png)
+![qualitative](docs/figs/qualitative.png)
 
 
 ## TODO List
