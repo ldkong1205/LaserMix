@@ -80,7 +80,7 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 ## Video Demo
 | Demo 1 | Demo 2| Demo 3 | 
 | :-: | :-: | :-: |
-| <img width="99%" src="docs/figs/demo1.png"> |  <img width="99%" src="docs/figs/demo2.png"> |  <img width="99%" src="docs/figs/demo3.png"> | 
+| <img width="100%" src="docs/figs/demo1.png"> |  <img width="100%" src="docs/figs/demo2.png"> |  <img width="100%" src="docs/figs/demo3.png"> | 
 | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: |
 
 
