@@ -78,11 +78,10 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 
 ## Video Demo
-<p>
-<a href="https://www.youtube.com/watch?v=LKzBqtmxXLg">
-<img width="80%" src="figs/demo-cover.png">
-</a>
-</p>
+| Demo 1 | Demo 2| Demo 3 | 
+| :-: | :-: | :-: |
+| <img width="99%" src="figs/demo1.jpg"> |  <img width="99%" src="figs/demo2.jpg"> |  <img width="99%" src="figs/demo3.jpg"> | 
+| [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: |
 
 
 ## Main Results
@@ -176,10 +175,9 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 - [x] Initial release. :rocket:
 - [x] Add license. See [here](#license) for more details.
-- [x] Add visualization video. :movie_camera:
-- [ ] Add demo at Hugging Face Spaces. :hugs:
-- [ ] Add installation details.
-- [ ] Add data preparation details.
+- [x] Add video demos :movie_camera:
+- [x] Add installation details.
+- [x] Add data preparation details.
 - [ ] Add evaluation details.
 - [ ] Add training details.
 
