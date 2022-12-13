@@ -9,6 +9,10 @@ lib64/
 log/
 logs/
 
+sparsehash/
+torchsparse/
+torchsparse_dir/
+
 .cache
 .env
 .ipynb_checkpoints
