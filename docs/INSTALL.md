@@ -21,34 +21,34 @@ For the **voxel option**, we use a more compact version of [Cylinder3D](https://
 
 
 ### Step 1: Create Enviroment
-```
+```Shell
 conda create -n lasermix python=3.10
 ```
 
 ### Step 2: Activate Enviroment
-```
+```Shell
 conda activate lasermix
 ```
 
 ### Step 3: Install PyTorch
-```
+```Shell
 conda install pytorch==1.11.0 torchvision==0.12.0 cudatoolkit=11.3 -c pytorch
 ```
 
 ### Step 4: Install Necessary Libraries
 #### 4.1 - [nuScenes devkit](https://github.com/nutonomy/nuscenes-devkit)
 :oncoming_automobile: **Note:** This toolkit is **required** in order to run experiments on the [nuScenes](https://www.nuscenes.org/nuscenes) dataset.
-```
+```Shell
 pip install nuscenes-devkit 
 ```
 
 #### 4.2 - [PyTorch Scatter](https://github.com/rusty1s/pytorch_scatter)
-```
+```Shell
 conda install pytorch-scatter -c pyg
 ```
 
 #### 4.3 - [SparseConv](https://github.com/traveller59/spconv)
-```
+```Shell
 pip install spconv_cu113
 ```
 
@@ -56,13 +56,13 @@ pip install spconv_cu113
 :cactus: **Note:** The following steps are **required** in order to use the `voxel` backbones in this codebase.
 
 - Make a directory named `torchsparse_dir`
-```
+```Shell
 cd package/
 mkdir torchsparse_dir/
 ```
 
 - Unzip the `.zip` files in `package/`
-```
+```Shell
 unzip sparsehash.zip
 unzip torchsparse.zip
 
@@ -70,26 +70,26 @@ mv sparsehash-master/ sparsehash/
 mv torchsparse-master/ torchsparse/
 ```
 
-- Setup `sparsehash` (Note that `${ROOT}` is your home path to the LaserMix folder)
-```
+- Setup `sparsehash` (Note that `${ROOT}` should be your home path to the LaserMix folder)
+```Shell
 cd sparsehash/
 ./configure --prefix=/${ROOT}/LaserMix/package/torchsparse_dir/SparsehasH/
 ```
-```
+```Shell
 make
 ```
-```
+```Shell
 make install
 ```
 
 - Compile `torchsparse`
-```
+```Shell
 cd ..
 pip install ./torchsparse
 ```
 
 - It takes a while to build wheels. After successfully building `torchsparse`, you should see the following:
-```
+```Shell
 Successfully built torchsparse
 Installing collected packages: torchsparse
 Successfully installed torchsparse-2.0.0b0
@@ -98,7 +98,7 @@ Successfully installed torchsparse-2.0.0b0
 
 
 #### 4.5 - Other Packages
-```
+```Shell
 pip install pyyaml easydict numba
 ```
 
