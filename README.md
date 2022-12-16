@@ -49,7 +49,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 - \[2022.12\] - We support a wider range of LiDAR segmentation backbones, including [RangeNet++](https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf), [SalsaNext](https://arxiv.org/abs/2003.03653), [FIDNet](https://arxiv.org/abs/2109.03787), [CENet](https://arxiv.org/abs/2207.12691), [Cylinder3D](https://openaccess.thecvf.com/content/CVPR2021/papers/Zhu_Cylindrical_and_Asymmetrical_3D_Convolution_Networks_for_LiDAR_Segmentation_CVPR_2021_paper.pdf), and [SPVCNN](https://arxiv.org/pdf/2007.16100), under both fully- and semi-supervised settings. The checkpoints will be available soon!
 - \[2022.12\] - The derivation of spatial-prior-based SSL is available [here](https://ldkong.com/LaserMix/derivation.pdf). Take a look!
 - \[2022.08\] - LaserMix achieves 1st place among the semi-supervised semantic segmentation leaderboards of [nuScenes](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-25), [SemanticKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-24), and [ScribbleKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-23), based on [Paper-with-Code](https://paperswithcode.com/paper/lasermix-for-semi-supervised-lidar-semantic).
-- \[2022.08\] - We provide a [video demo](https://www.youtube.com/watch?v=LKzBqtmxXLg) for visual comparisons on the SemanticKITTI val set. Take a look!
+- \[2022.08\] - We provide a [video demo](https://youtu.be/Xkwa5-dT0g4) for visual comparisons on the SemanticKITTI val set. Take a look!
 - \[2022.07\] - Our paper is available on arXiv, click <a href="https://arxiv.org/abs/2207.00026" target='_blank'>here</a> to check it out. Code will be available soon!
 
 
@@ -81,7 +81,7 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 | Demo 1 | Demo 2| Demo 3 | 
 | :-: | :-: | :-: |
 | <img width="100%" src="docs/figs/demo1.png"> |  <img width="100%" src="docs/figs/demo2.png"> |  <img width="100%" src="docs/figs/demo3.png"> | 
-| [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: | [Link]() :arrow_heading_up: |
+| [Link](https://youtu.be/Xkwa5-dT0g4) <sup>:arrow_heading_up:</sup> | [Link](https://youtu.be/OlKNDt8_um4) <sup>:arrow_heading_up:</sup> | [Link](https://youtu.be/f8UKgxi5mow) <sup>:arrow_heading_up:</sup> |
 
 
 ## Main Result
