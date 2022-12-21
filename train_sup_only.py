@@ -176,35 +176,26 @@ def main():
 
         if cfg.MODEL.BACKBONE == 'fidnet':
             from model.range.fidnet.network import FIDNet
-            model = FIDNet(num_class=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1)
+            model = FIDNet(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+            )
         elif cfg.MODEL.BACKBONE == 'cenet':
             from model.range.cenet.network import CENet
-            model = CENet(num_class=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1, aux=False)
+            model = CENet(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+                aux=False,
+            )
         else:
             raise NotImplementedError
 
     elif cfg.MODEL.MODALITY == 'voxel':
 
         if cfg.MODEL.BACKBONE == 'cylinder3d':
-            from model.voxel.cylinder3d.module import asymm_3d_spconv, cylinder_fea
-            from model.voxel.cylinder3d.network import get_model_class
-
-            cylinder_3d_spconv_seg = asymm_3d_spconv(
-                output_shape=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
-                num_input_features=cfg.MODEL.NUM_IN_FEA,
+            from model.voxel.cylinder3d.network import Cylinder3D
+            model = Cylinder3D(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+                in_fea_dim=cfg.MODEL.NUM_IN_FEA,
                 init_size=cfg.MODEL.INIT_SIZE,
-                nclasses=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
-            )
-            cy_fea_net = cylinder_fea(
-                grid_size=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
-                fea_dim=9,
-                out_pt_fea_dim=256,
-                fea_compre=16,
-            )
-            model = get_model_class("cylinder_asym")(
-                sparse_shape=cfg.MODEL.RESOLUTION.NUSCENES if cfg.DATA.DATASET == 'nuscenes' else cfg.MODEL.RESOLUTION.SEMANTICKITTI,
-                cylin_model=cy_fea_net,
-                segmentator_spconv=cylinder_3d_spconv_seg,
             )
         else:
             raise NotImplementedError

@@ -124,7 +124,7 @@ class BasicBlock(nn.Module):
 class CENet(nn.Module):
     def __init__(
         self,
-        num_class: int,
+        num_cls: int,
         aux: bool,
         block = BasicBlock,
         layers: list = [3, 4, 6, 3],
@@ -157,12 +157,12 @@ class CENet(nn.Module):
 
         self.conv_1 = BasicConv2d(640, 256, kernel_size=3, padding=1)
         self.conv_2 = BasicConv2d(256, 128, kernel_size=3, padding=1)
-        self.semantic_output = nn.Conv2d(128, num_class, 1)
+        self.semantic_output = nn.Conv2d(128, num_cls, 1)
 
         if self.aux:
-            self.aux_head1 = nn.Conv2d(128, num_class, 1)
-            self.aux_head2 = nn.Conv2d(128, num_class, 1)
-            self.aux_head3 = nn.Conv2d(128, num_class, 1)
+            self.aux_head1 = nn.Conv2d(128, num_cls, 1)
+            self.aux_head2 = nn.Conv2d(128, num_cls, 1)
+            self.aux_head3 = nn.Conv2d(128, num_cls, 1)
 
     def _make_layer(self, block, planes, blocks, stride=1, dilate=False):
         norm_layer = self._norm_layer

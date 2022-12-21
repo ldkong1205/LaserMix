@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'range.sup_only'
-SUFFIX: '_cenet_'
+SUFFIX: ''
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']

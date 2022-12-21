@@ -1,5 +1,4 @@
-import logging
-import os.path as osp
+import os
 from typing import Dict, List, Tuple
 import numpy as np
 
@@ -100,7 +99,7 @@ class NuscLidarSegDatabase(LidarSegDatabaseInterface):
             else:
                 points_label = np.zeros((points.shape[0],), dtype=np.uint8)  # dummy labels; won't be needed in test
         else:
-            lidarseg_labels_filename = osp.join(
+            lidarseg_labels_filename = os.path.join(
                 self.db.dataroot,
                 self.db.get('lidarseg', sample_data_token)['filename']
             )
@@ -202,7 +201,7 @@ def load_pointcloud_from_db_ref_channel(
     sample_data_token = sample_rec['data'][channel]
     sd_rec = db.get('sample_data', sample_data_token)
 
-    pc = LidarPointCloud.from_file(osp.join(db.dataroot, sd_rec['filename']))  # [6, m]
+    pc = LidarPointCloud.from_file(os.path.join(db.dataroot, sd_rec['filename']))  # [6, m]
 
     timevector = np.zeros((1, pc.nbr_points()), dtype=np.float32)
     pc.points = np.concatenate((pc.points, timevector), axis=0)

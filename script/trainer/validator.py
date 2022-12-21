@@ -2,6 +2,7 @@ import torch
 from torch.nn import functional as F
 
 from script.evaluator.avgmeter import AverageMeter
+from script.trainer.utils import map_data_to_gpu
 
 
 def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, device):
@@ -40,14 +41,9 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
 
             if cfg.MODEL.MODALITY == 'range':
                 scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)
-                bs = scan.size(0)
 
             elif cfg.MODEL.MODALITY == 'voxel':
-                scan, label, p_fea, _ = data
-                scan = [torch.from_numpy(i).to(device) for i in scan]  # [N, 3]
-                label = label.type(torch.LongTensor).to(device)  # [bs, 480, 360, 32]
-                p_fea = [torch.from_numpy(i).type(torch.FloatTensor).to(device) for i in p_fea]
-                bs = len(scan)
+                map_data_to_gpu(data)
 
             with torch.cuda.amp.autocast(enabled=args.amp):
 
@@ -57,7 +53,7 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
                         logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)  # [bs, cls, H, W]
                     
                 elif cfg.MODEL.MODALITY == 'voxel':
-                    pass
+                    logits, label = model(data)  # [uniq, cls], [uniq]
                 
                 wce  = criterion[0](logits, label).contiguous().view(-1).mean()
                 jacc = criterion[1](F.softmax(logits, dim=1), label)
@@ -66,14 +62,14 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
             # measure accuracy and record loss
             argmax = F.softmax(logits, dim=1).argmax(dim=1)
             evaluator.addBatch(argmax, label)
-            meter_loss.update(loss.mean().item(), bs)
-            meter_jacc.update(jacc.mean().item(), bs)
-            meter_wce.update(wce.mean().item(), bs)
+            meter_loss.update(loss.mean().item(), cfg.VALID.BATCH_SIZE)
+            meter_jacc.update(jacc.mean().item(), cfg.VALID.BATCH_SIZE)
+            meter_wce.update(wce.mean().item(), cfg.VALID.BATCH_SIZE)
 
         accuracy = evaluator.getacc()
         jaccard, class_jaccard = evaluator.getIoU()
-        meter_acc.update(accuracy.item(), bs)
-        meter_iou.update(jaccard.item(), bs)
+        meter_acc.update(accuracy.item(), cfg.VALID.BATCH_SIZE)
+        meter_iou.update(jaccard.item(), cfg.VALID.BATCH_SIZE)
 
         logger.info("validation")
         logger.info("  loss avg: {loss.avg:.4f}".format(loss=meter_loss))

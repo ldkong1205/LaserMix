@@ -219,7 +219,7 @@ def create_splits_scenes(verbose: bool = False) -> Dict[str, List[str]]:
 def get_range_proj_coordinates(
         points: np.ndarray,
         ring: np.ndarray = None,
-        horiz_angular_res: float = 0.4,
+        horiz_angular_res: float = 0.1875,
         num_rings: int = 32,
         proj_fov_up: float = 10.0,
         proj_fov_down: float = -10.0

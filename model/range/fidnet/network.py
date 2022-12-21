@@ -7,11 +7,11 @@ class FIDNet(nn.Module):
 
     def __init__(
         self,
-        num_class: int
+        num_cls: int
     ):
         super(FIDNet, self).__init__()
         self.backend=Backbone(if_BN=True, if_remission=True, if_range=True, with_normal=False)
-        self.semantic_head=SemanticHead(num_class=num_class, input_channel=1024)
+        self.semantic_head=SemanticHead(num_cls=num_cls, input_channel=1024)
 
     def forward(self, x):
         middle_feature_maps=self.backend(x)  # [bs, 1024, H, W]
@@ -141,7 +141,7 @@ class SemanticHead(nn.Module):
 
     def __init__(
         self,
-        num_class: int = 20,
+        num_cls: int = 20,
         input_channel: int = 1024,
     ):
         super(SemanticHead,self).__init__()
@@ -154,7 +154,7 @@ class SemanticHead(nn.Module):
         self.bn2 = nn.BatchNorm2d(128)
         self.relu_2 = nn.LeakyReLU()
 
-        self.semantic_output=nn.Conv2d(128, num_class, 1)
+        self.semantic_output=nn.Conv2d(128, num_cls, 1)
 
     def forward(self, input_tensor):
         res=self.conv_1(input_tensor)   # [bs, 512, H, W]

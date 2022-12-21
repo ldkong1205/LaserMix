@@ -2,13 +2,13 @@ import cv2
 import glob
 import random
 import yaml
-from collections import defaultdict
 
 import numba as nb
 import numpy as np
 import torch
 from torch.utils import data
 from torchvision.transforms import functional as F
+from torchsparse.utils.quantize import sparse_quantize
 
 from data.semantickitti.laserscan import SemLaserScan
 from data.semantickitti.pointcloud import SemkittiDataset
@@ -248,6 +248,8 @@ class SemkittiCylinderDatabase(data.Dataset):
         augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
+        n_cls: int = 20,
+        ignore_label: int = 0,
     ):
         super().__init__()
         self.root = root
@@ -269,7 +271,8 @@ class SemkittiCylinderDatabase(data.Dataset):
         else:
             raise NotImplementedError
 
-        self.ignore_label = 0
+        self.n_cls = n_cls
+        self.ignore_label = ignore_label
         self.max_volume_space = max_volume_space
         self.min_volume_space = min_volume_space
 
@@ -280,9 +283,8 @@ class SemkittiCylinderDatabase(data.Dataset):
     def __getitem__(self, index):
         pc_data = self.point_cloud_dataset[index]
 
-        points = pc_data['scan'][:, :3]  # x, y, z
-        intensity = pc_data['scan'][:, 3]  # intensity
-        labels = pc_data['label']
+        points = pc_data['scan'][:, :4]  # x, y, z, intensity
+        point_label = pc_data['label']  # label
 
         # data aug (drop)
         if self.if_drop:
@@ -291,8 +293,7 @@ class SemkittiCylinderDatabase(data.Dataset):
             self.points_to_drop = np.random.randint(low=0, high=len(points)-1, size=num_drop)
             self.points_to_drop = np.unique(self.points_to_drop)
             points = np.delete(points, self.points_to_drop, axis=0)
-            intensity = np.delete(intensity, self.points_to_drop)
-            labels = np.delete(labels, self.points_to_drop)
+            point_label = np.delete(point_label, self.points_to_drop)
 
         # data aug (flip)
         if self.if_flip:
@@ -324,31 +325,39 @@ class SemkittiCylinderDatabase(data.Dataset):
         if self.if_jitter:
             jitter = 0.1
             rand_jitter = np.clip(np.random.normal(0, jitter, 3), -3 * jitter, 3 * jitter)
-            points += rand_jitter
+            points[:, :3] += rand_jitter
 
         xyz_pol = self.cart2polar(points)
-        xyz_pol[:, 1] = xyz_pol[:, 1] / np.pi * 180.0
+        xyz_pol[:, 1] = xyz_pol[:, 1] / np.pi * 180.
 
-        max_bound = np.asarray(self.max_volume_space)
-        min_bound = np.asarray(self.min_volume_space)
+        max_bound = np.asarray(self.max_volume_space)  # [50, 180,  2]
+        min_bound = np.asarray(self.min_volume_space)  # [0, -180, -4]
 
         crop_range = max_bound - min_bound
         cur_grid_size = self.voxel_grid_size
         intervals = crop_range / (cur_grid_size - 1)
 
-        grid_ind = (np.floor((np.clip(xyz_pol, min_bound, max_bound) - min_bound) / intervals)).astype(np.int)
+        point_coord = (np.floor((np.clip(xyz_pol, min_bound, max_bound) - min_bound) / intervals)).astype(np.int)
 
-        processed_label = np.ones(self.voxel_grid_size, dtype=np.uint8) * self.ignore_label
-        label_voxel_pair = np.concatenate([grid_ind, np.expand_dims(labels, axis=-1)], axis=1)
-        label_voxel_pair = label_voxel_pair[np.lexsort((grid_ind[:, 0], grid_ind[:, 1], grid_ind[:, 2])), :]
-        processed_label = nb_process_label(np.copy(processed_label), label_voxel_pair)
+        voxel_coord, voxel_label, inds, inverse_map = voxelize_with_label(
+            n_cls=self.n_cls, point_coord=point_coord, point_label=point_label,
+        )
+        voxel_center = (voxel_coord.astype(np.float32) + 0.5) * intervals + min_bound
+        voxel_fea = np.concatenate([voxel_center, xyz_pol[inds], points[inds][:, :2], points[inds][:, 3:]], axis=1)
+        point_voxel_centers = (point_coord.astype(np.float32) + 0.5) * intervals + min_bound
 
-        voxel_centers = (grid_ind.astype(np.float32) + 0.5) * intervals + min_bound
-        return_xyz = xyz_pol - voxel_centers
-        return_xyz = np.concatenate((return_xyz, xyz_pol, points[:, :2]), axis=1)
-        return_fea = np.concatenate((return_xyz, np.expand_dims(intensity, axis=-1)), axis=1)
+        point_fea = np.concatenate([point_voxel_centers, xyz_pol, points[:, :2], points[:, 3:]], axis=1)
         
-        return (grid_ind, processed_label, return_fea, labels)
+        return {
+            'point_fea': point_fea.astype(np.float32),
+            'voxel_fea': voxel_fea.astype(np.float32),
+            'point_coord': point_coord.astype(np.float32),
+            'voxel_coord': voxel_coord.astype(np.int),
+            'point_label': point_label.astype(np.int),
+            'voxel_label': voxel_label.astype(np.int),
+            'inverse_map': inverse_map.astype(np.int),
+            'num_points': np.array([points.shape[0]]),
+        }
 
     def cart2polar(self, input_xyz):
         rho = np.sqrt(input_xyz[:, 0] ** 2 + input_xyz[:, 1] ** 2)
@@ -359,4 +368,131 @@ class SemkittiCylinderDatabase(data.Dataset):
         x = input_xyz_polar[0] * np.cos(input_xyz_polar[1])
         y = input_xyz_polar[0] * np.sin(input_xyz_polar[1])
         return np.stack((x, y, input_xyz_polar[2]), axis=0)
+
+
+def voxelize_with_label(n_cls, point_coord, point_label):
+    voxel_coord, inds, inverse_map = sparse_quantize(point_coord, return_index=True, return_inverse=True)
+    voxel_label_counter = np.zeros([voxel_coord.shape[0], n_cls])
+
+    for ind in range(len(inverse_map)):
+        if point_label[ind] != 67:
+            voxel_label_counter[inverse_map[ind]][point_label[ind]] += 1
+    
+    voxel_label = np.argmax(voxel_label_counter, axis=1)
+
+    return voxel_coord, voxel_label, inds, inverse_map
+
+
+class SemkittiVoxelDatabase(data.Dataset):
+    def __init__(
+        self,
+        root: str,
+        split: str,
+        data_split: str = None,
+        voxel_grid_size: list = [240, 180, 32],
+        max_volume_space: list = [50, 180, 2],
+        min_volume_space: list = [0, -180, -4],
+        augment: str = 'NoAugment',
+        if_scribble: bool = False,
+        if_sup_only: bool = False,
+        n_cls: int = 20,
+        ignore_label: int = 0,
+    ):
+        super().__init__()
+        self.root = root
+        self.voxel_grid_size = np.array(voxel_grid_size)
+        self.augment = augment
+
+        self.point_cloud_dataset = SemkittiDataset(
+            root=self.root,
+            split=split,
+            data_split=data_split,
+            if_scribble=if_scribble,
+            if_sup_only=if_sup_only,
+        )
+
+        if self.augment == 'GlobalAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = True, True, True, True, True
+        elif self.augment == 'NoAugment':
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, False, False, False, False
+        else:
+            raise NotImplementedError
+
+        self.n_cls = n_cls
+        self.ignore_label = ignore_label
+        self.max_volume_space = max_volume_space
+        self.min_volume_space = min_volume_space
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.point_cloud_dataset)
+
+    def __getitem__(self, index):
+        pc_data = self.point_cloud_dataset[index]
+
+        points = pc_data['scan'][:, :4]  # x, y, z, intensity
+        point_label = pc_data['label']  # label
+
+        # data aug (drop)
+        if self.if_drop:
+            max_num_drop = int(len(points) * 0.1)  # drop ~10%
+            num_drop = np.random.randint(low=0, high=max_num_drop)
+            self.points_to_drop = np.random.randint(low=0, high=len(points)-1, size=num_drop)
+            self.points_to_drop = np.unique(self.points_to_drop)
+            points = np.delete(points, self.points_to_drop, axis=0)
+            point_label = np.delete(point_label, self.points_to_drop)
+
+        # data aug (flip)
+        if self.if_flip:
+            flip_type = np.random.choice(4, 1)
+            if flip_type == 1:
+                points[:, 0] = -points[:, 0]  # flip x
+            elif flip_type == 2:
+                points[:, 1] = -points[:, 1]  # flip y
+            elif flip_type == 3:
+                points[:, :2] = -points[:, :2]  # flip both x and y
+        
+        # data aug (scale)
+        if self.if_scale:
+            scale = 1.05  # [-5%, +5%]
+            rand_scale = np.random.uniform(1, scale)
+            if np.random.random() < 0.5:
+                rand_scale = 1 / scale
+            points[:, 0] *= rand_scale
+            points[:, 1] *= rand_scale
+
+        # data aug (rotate)
+        if self.if_rotate:
+            rotate_rad = np.deg2rad(np.random.random() * 90) - np.pi / 4
+            c, s = np.cos(rotate_rad), np.sin(rotate_rad)
+            j = np.matrix([[c, s], [-s, c]])
+            points[:, :2] = np.dot(points[:, :2], j)
+
+        # data aug (jitter)
+        if self.if_jitter:
+            jitter = 0.1
+            rand_jitter = np.clip(np.random.normal(0, jitter, 3), -3 * jitter, 3 * jitter)
+            points[:, :3] += rand_jitter
+
+        xyz_pol = points[:, :3]
+        point_coord = np.round(points[:, :3] / 0.05).astype(np.int32)
+        point_coord -= point_coord.min(0, keepdims=1)
+
+        voxel_coord, voxel_label, inds, inverse_map = voxelize_with_label(
+            n_cls=self.n_cls, point_coord=point_coord, point_label=point_label,
+        )
+
+        voxel_fea = np.concatenate([xyz_pol[inds], points[inds][:, 3:]], axis=1)
+        point_fea = np.concatenate([xyz_pol, points[:, 3:]], axis=1)
+        
+        return {
+            'point_fea': point_fea.astype(np.float32),
+            'voxel_fea': voxel_fea.astype(np.float32),
+            'point_coord': point_coord.astype(np.float32),
+            'voxel_coord': voxel_coord.astype(np.int),
+            'point_label': point_label.astype(np.int),
+            'voxel_label': voxel_label.astype(np.int),
+            'inverse_map': inverse_map.astype(np.int),
+        }
+
 

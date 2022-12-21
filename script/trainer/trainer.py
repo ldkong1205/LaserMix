@@ -3,8 +3,9 @@ import os
 import torch
 from torch.nn import functional as F
 
-from script.utils.data import collate_batch
+from script.utils.data import collate_batch_voxel
 from script.trainer.utils import ClassWeightSemikitti, CrossEntropyDiceLoss, Lovasz_softmax, BoundaryLoss
+from script.trainer.utils import map_data_to_gpu
 from script.trainer.validator import validate
 from script.evaluator.avgmeter import AverageMeter
 from script.evaluator.ioueval import iouEval
@@ -21,7 +22,7 @@ def train(logger, model, datasets, args, cfg, device):
         batch_size=cfg.TRAIN.BATCH_SIZE,
         sampler=sampler_train,
         num_workers=cfg.TRAIN.NUM_WORKERS,
-        collate_fn=collate_batch if cfg.MODEL.MODALITY == 'voxel' else None,
+        collate_fn=collate_batch_voxel if cfg.MODEL.MODALITY == 'voxel' else None,
         drop_last=True,
         pin_memory=True
     )
@@ -33,7 +34,7 @@ def train(logger, model, datasets, args, cfg, device):
         batch_size=cfg.VALID.BATCH_SIZE,
         shuffle=False,
         num_workers=cfg.VALID.NUM_WORKERS,
-        collate_fn=collate_batch if cfg.MODEL.MODALITY == 'voxel' else None,
+        collate_fn=collate_batch_voxel if cfg.MODEL.MODALITY == 'voxel' else None,
         drop_last=True, 
         pin_memory=True
     )
@@ -90,14 +91,14 @@ def train(logger, model, datasets, args, cfg, device):
     
     if cfg.OPTIM.LOSS == 'wce':
         weight = torch.tensor(ClassWeightSemikitti.get_weight()).to(device)
-        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=weight, ignore_index=0).to(device)
+        WCE = torch.nn.CrossEntropyLoss(reduction='none', weight=None, ignore_index=0).to(device)
     elif cfg.OPTIM.LOSS == 'dice':
         WCE = CrossEntropyDiceLoss(reduction='none', weight=None, ignore_index=0).to(device)
     else:
         raise NotImplementedError
     
     if cfg.OPTIM.IF_LS_LOSS:
-        LS = Lovasz_softmax(ignore=0).to(device)
+        LS = Lovasz_softmax(ignore=0, modality=cfg.MODEL.MODALITY).to(device)
     
     if cfg.OPTIM.IF_BD_LOSS:
         BD = BoundaryLoss().to(device)
@@ -137,19 +138,13 @@ def train(logger, model, datasets, args, cfg, device):
 
         model.train()
 
-        # for idx, (scan, label, _, _) in enumerate(loader_train):
         for idx, data in enumerate(loader_train):
 
             if cfg.MODEL.MODALITY == 'range':
                 scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)
-                bs = scan.size(0)
                 
             elif cfg.MODEL.MODALITY == 'voxel':
-                scan, label, p_fea, _ = data
-                scan = [torch.from_numpy(i).to(device) for i in scan]  # [N, 3]
-                label = label.type(torch.LongTensor).to(device)  # [bs, 480, 360, 32]
-                p_fea = [torch.from_numpy(i).type(torch.FloatTensor).to(device) for i in p_fea]
-                bs = len(scan)
+                map_data_to_gpu(data)
 
             optimizer.zero_grad()
             lr = scheduler.get_last_lr()[0]
@@ -162,7 +157,7 @@ def train(logger, model, datasets, args, cfg, device):
                         logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)  # [bs, cls, H, W]
 
                 elif cfg.MODEL.MODALITY == 'voxel':
-                    logits = model(p_fea, scan, bs)
+                    logits, label = model(data)  # [uniq, cls], [uniq]
 
                 pixel_losses = WCE(logits, label)
                 pixel_losses = pixel_losses.contiguous().view(-1)
@@ -203,20 +198,20 @@ def train(logger, model, datasets, args, cfg, device):
                 accuracy = evaluator.getacc()
                 jaccard, _ = evaluator.getIoU()
 
-            meter_loss.update(loss.item(), bs)
-            meter_acc.update(accuracy.item(), bs)
-            meter_iou.update(jaccard.item(), bs)
-            meter_wce.update(loss_ce.item(), bs)
+            meter_loss.update(loss.item(), cfg.TRAIN.BATCH_SIZE)
+            meter_acc.update(accuracy.item(), cfg.TRAIN.BATCH_SIZE)
+            meter_iou.update(jaccard.item(), cfg.TRAIN.BATCH_SIZE)
+            meter_wce.update(loss_ce.item(), cfg.TRAIN.BATCH_SIZE)
 
             if cfg.OPTIM.IF_LS_LOSS:
-                meter_ls.update(loss_ls.item(), bs)
+                meter_ls.update(loss_ls.item(), cfg.TRAIN.BATCH_SIZE)
             else:
-                meter_ls.update(loss_ls, bs)
+                meter_ls.update(loss_ls, cfg.TRAIN.BATCH_SIZE)
 
             if cfg.OPTIM.IF_BD_LOSS:
-                meter_bd.update(loss_bd.item(), bs)
+                meter_bd.update(loss_bd.item(), cfg.TRAIN.BATCH_SIZE)
             else:
-                meter_bd.update(loss_bd, bs)
+                meter_bd.update(loss_bd, cfg.TRAIN.BATCH_SIZE)
 
             if idx % 10 == 0:
                 logger.info(
@@ -225,7 +220,7 @@ def train(logger, model, datasets, args, cfg, device):
                     'lr: {lr:.6f} '.format(
                         epoch, idx, num_batch_train, acc=meter_acc, iou=meter_iou,
                         loss=meter_loss, wce=meter_wce, ls=meter_ls, bd=meter_bd,
-                        lr=lr
+                        lr=lr,
                     )
                 )
 
@@ -241,7 +236,7 @@ def train(logger, model, datasets, args, cfg, device):
                 info=info,
                 args=args,
                 cfg=cfg,
-                device=device
+                device=device,
             )
 
             logger.info("*" * 80)

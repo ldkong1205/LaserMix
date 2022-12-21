@@ -157,8 +157,6 @@ class SemkittiDataset(data.Dataset):
             label = label & 0xFFFF
             label = np.vectorize(LEARNING_MAP.__getitem__)(label)
         
-        # ringID = self.get_kitti_ringID(scan).reshape((-1, 1))
-        # scan = np.concatenate([scan, ringID.reshape(-1, 1)], axis=1).astype(np.float32)
         pc_data = {
             'scan': scan,
             'label': label.astype(np.uint8),

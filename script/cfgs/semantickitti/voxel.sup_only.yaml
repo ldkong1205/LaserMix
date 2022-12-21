@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'voxel.sup_only'
-SUFFIX: '_cylinder3d'
+SUFFIX: ''
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
@@ -16,26 +16,26 @@ MODEL:
         NUSCENES: [480, 360, 32]
         SEMANTICKITTI: [480, 360, 32]
         SCRIBBLEKITTI: [480, 360, 32]
-    NUM_IN_FEA: 16
-    INIT_SIZE: 16  # 32
+    NUM_IN_FEA: 9
+    INIT_SIZE: 16
 
 TRAIN:
     NUM_EPOCHS: 20  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
-    BATCH_SIZE: 8
+    BATCH_SIZE: 16
     NUM_WORKERS: 8
 
 VALID:
-    BATCH_SIZE: 8
+    BATCH_SIZE: 16
     NUM_WORKERS: 8
-    EPOCH_START_VAL: 1
+    EPOCH_START_VAL: 0
 
 OPTIM:
-    LOSS: 'dice'  # choices: ['wce', 'dice']
+    LOSS: 'wce'  # choices: ['wce', 'dice']
     IF_LS_LOSS: True
     IF_BD_LOSS: False
     TOP_K_PERCENT_PIXELS: 1.0
     OPTIMIZER: 'adamw'  # choices: ['adamw', 'sgd']
-    LEARNING_RATE: 0.001
+    LEARNING_RATE: 0.01
     SCHEDULER: 'onecycle'  # choices: ['onecycle', 'step']
 
 GENERAL:

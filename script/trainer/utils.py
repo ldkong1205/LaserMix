@@ -8,17 +8,15 @@ import torch.nn.functional as F
 from torch.nn.modules.loss import _WeightedLoss
 from torchvision.transforms import functional as FF
 from torch.autograd import Variable
+from torchsparse import SparseTensor
 
 try:
     from itertools import ifilterfalse
 except ImportError:
     from itertools import filterfalse as ifilterfalse
 
-from data.semantickitti.laserscan import LaserScan
-
 
 inv_label_dict = {0: 0, 1: 10, 2: 11, 3: 15, 4: 18, 5: 20, 6: 30, 7: 31, 8: 32, 9: 40, 10: 44, 11: 48, 12: 49, 13: 50, 14: 51, 15: 70, 16: 71, 17: 72, 18: 80, 19: 81}
-
 
 
 def postprocess_knn(A, pred, depth, knn, device):
@@ -323,15 +321,65 @@ def flatten_probas(probas, labels, ignore=None):
     return vprobas, vlabels
 
 
+def flatten_(probas, labels, ignore=None):
+    if probas.dim() == 3:
+        B, H, W = probas.size()
+        probas = probas.view(B, 1, H, W)
+    elif probas.dim() == 4:
+        B, C, H, W = probas.size()
+        probas = probas.permute(0, 2, 3, 1).contiguous().view(-1, C)
+    elif probas.dim() == 5:
+        B, C, L, H, W = probas.size()
+        probas = probas.contiguous().view(B, C, L, H*W)
+    labels = labels.view(-1)
+    if ignore is None:
+        return probas, labels
+    valid = (labels != ignore)
+    vprobas = probas[valid.nonzero().squeeze()]
+    vlabels = labels[valid]
+    return vprobas, vlabels
+
+
+def lovasz_softmax_flat(probas, labels, classes='present', per_image=False, ignore=None):
+    if probas.numel() == 0:
+        return probas * 0.
+    
+    C = probas.size(1)
+    losses = []
+    class_to_sum = list(range(C)) if classes in ['all', 'present'] else classes
+
+    for c in class_to_sum:
+        fg = (labels == c).float()
+        if (classes is 'present' and fg.sum() == 0):
+            continue
+        if C == 1:
+            if len(classes) > 1:
+                raise ValueError('Sigmoid output possible only with 1 class')
+            class_pred = probas[:, 0]
+        else:
+            class_pred = probas[:, c]
+        errors = (Variable(fg) - class_pred).abs()
+        errors_sorted, perm = torch.sort(errors, 0, descending=True)
+        perm = perm.data
+        fg_sorted = fg[perm]
+        losses.append(torch.dot(errors_sorted, Variable(lovasz_grad(fg_sorted))))
+    
+    return mean(losses)
+
+
 class Lovasz_softmax(torch.nn.Module):
-    def __init__(self, classes='present', per_image=False, ignore=None):
+    def __init__(self, classes='present', per_image=False, ignore=None, modality=None):
         super(Lovasz_softmax, self).__init__()
         self.classes = classes
         self.per_image = per_image
         self.ignore = ignore
+        self.modality = modality
 
     def forward(self, probas, labels):
-        return lovasz_softmax(probas, labels, self.classes, self.per_image, self.ignore)
+        if self.modality == 'range':
+            return lovasz_softmax(probas, labels, self.classes, self.per_image, self.ignore)
+        elif self.modality == 'voxel':
+            return lovasz_softmax_flat(*flatten_(probas, labels, self.ignore), classes=self.classes)
 
 
 class DiceLoss(_WeightedLoss):
@@ -539,3 +587,20 @@ def one_hot(label, n_classes, requires_grad=True):
     one_hot_label = one_hot_label.transpose(1, 3).transpose(2, 3)
 
     return one_hot_label
+
+
+def map_data_to_gpu(batch_dict):
+    for key, val in batch_dict.items():
+        if isinstance(val, torch.Tensor):
+            batch_dict[key] = val.cuda()
+        elif isinstance(val, SparseTensor):
+            batch_dict[key] = val.cuda()
+        elif isinstance(val, np.ndarray):
+            batch_dict[key] = torch.from_numpy(val).cuda()
+        elif isinstance(val, dict):
+            for k, v in val.items():
+                batch_dict[key][k] = v.cuda()
+        elif isinstance(val, list):
+            batch_dict[key] = val
+        else:
+            raise ValueError("Invalid type of batch_dict.")
