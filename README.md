@@ -124,6 +124,18 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
       <td><sup>+</sup>7.2</td>  <td><sup>+</sup>6.6</td>  <td><sup>+</sup>3.5</td> <td><sup>+</sup>4.2</td>
       <td><sup>+</sup>5.2</td>  <td><sup>+</sup>6.7</td>  <td><sup>+</sup>5.7</td> <td><sup>+</sup>6.2</td>
    </tr>
+   <tr>
+      <td><strong>LaserMix++</strong></td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   <tr>
+      <td><i>improv.</i> &#8593</td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
 </table>
 
 ### Voxel
@@ -157,6 +169,18 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
       <td><sup>+</sup><small>4.4</small></td> <td><sup>+</sup><small>4.0</small></td> <td><sup>+</sup><small>5.2</small></td> <td><sup>+</sup><small>2.0</small></td>
       <td><sup>+</sup><small>5.2</small></td> <td><sup>+</sup><small>3.9</small></td> <td><sup>+</sup><small>4.1</small></td> <td><sup>+</sup><small>3.6</small></td>
       <td><sup>+</sup><small>5.0</small></td> <td><sup>+</sup><small>5.7</small></td> <td><sup>+</sup><small>3.0</small></td> <td><sup>+</sup><small>3.0</small></td>
+   </tr>
+   <tr>
+      <td><strong>LaserMix++</strong></td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   <tr>
+      <td><i>improv.</i> &#8593</td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
 </table>
 
@@ -203,7 +227,7 @@ This work is under the <a rel="license" href="http://creativecommons.org/license
 
 
 ## Acknowledgement
-We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>8</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>9</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>10</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>11</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>12</sup>[CBST](https://github.com/yzou2/CBST), <sup>13</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>14</sup>[Cityscapes](https://www.cityscapes-dataset.com).
+We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[CENet](https://github.com/huixiancheng/CENet), <sup>8</sup>[SPVNAS](https://github.com/mit-han-lab/spvnas), <sup>9</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>10</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>11</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>12</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>13</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>14</sup>[CBST](https://github.com/yzou2/CBST), <sup>15</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>16</sup>[Cityscapes](https://www.cityscapes-dataset.com).
 
 We would like to thank <a href="https://hongfz16.github.io/" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
 
