@@ -8,11 +8,15 @@ This codebase is tested with `torch==1.11.0` and `torchvision==0.12.0`, with `CU
 
 ### Range View
 
-For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x1920` for SemanticKITTI and ScribbleKITTI.
+For the **range view option**, we use [FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI) as the LiDAR segmentation backbone. We adopt its *ResNet34-point* variant as recommended in the [original paper](https://arxiv.org/abs/2109.03787), which contains `6.05M` parameters. The resolutions of the rasterized range image are set as `32x1920` for nuScenes and `64x2048` for SemanticKITTI and ScribbleKITTI.
+
+:memo: **Updated 2022.12.21:** We now support three more mainstream range view LiDAR segmentation backbones, including [RangeNet++](https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf), [SalsaNext](https://arxiv.org/abs/2003.03653), and [CENet](https://arxiv.org/abs/2207.12691), with horizontal rasterization resolutions of `512`, `960`, `1024`, `1920`, and `2048`.
 
 
 ### Voxel
 For the **voxel option**, we use a more compact version of [Cylinder3D](https://github.com/xinge008/Cylinder3D) as the LiDAR segmentation backbone. It contains `28.13M` parameters (compared to 56.26M for the one used in the [original paper](https://arxiv.org/abs/2011.10033)). We also use a smaller voxel resolution `[240, 180, 32]` compared to the original configuration `[480, 360, 32]`. This saves around 4x memory consumption and further helps to speed up training.
+
+:memo: **Updated 2022.12.21:** We now support two more mainstream voxel-based LiDAR segmentation backbones, i.e., [MinkowskiUNet](https://github.com/NVIDIA/MinkowskiEngine) and [SPVCNN](https://arxiv.org/pdf/2007.16100). We also enable the use of both `cylinder` and `cubic` voxelizations, with various voxel lengths, under faster and more efficient sparse convolutional operations.
 
 #### Requirements
 - [torch-scatter](https://github.com/rusty1s/pytorch_scatter)
