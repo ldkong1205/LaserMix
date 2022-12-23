@@ -3,7 +3,6 @@ import os
 import torch
 from torch.nn import functional as F
 
-from script.utils.data import collate_batch_voxel
 from script.trainer.utils import ClassWeightSemikitti, CrossEntropyDiceLoss, Lovasz_softmax, BoundaryLoss
 from script.trainer.utils import map_data_to_gpu
 from script.trainer.validator import validate
@@ -22,7 +21,7 @@ def train(logger, model, datasets, args, cfg, device):
         batch_size=cfg.TRAIN.BATCH_SIZE,
         sampler=sampler_train,
         num_workers=cfg.TRAIN.NUM_WORKERS,
-        collate_fn=collate_batch_voxel if cfg.MODEL.MODALITY == 'voxel' else None,
+        collate_fn=None if cfg.MODEL.MODALITY == 'range' else datasets[0].collate_batch,
         drop_last=True,
         pin_memory=True
     )
@@ -34,7 +33,7 @@ def train(logger, model, datasets, args, cfg, device):
         batch_size=cfg.VALID.BATCH_SIZE,
         shuffle=False,
         num_workers=cfg.VALID.NUM_WORKERS,
-        collate_fn=collate_batch_voxel if cfg.MODEL.MODALITY == 'voxel' else None,
+        collate_fn=None if cfg.MODEL.MODALITY == 'range' else datasets[1].collate_batch,
         drop_last=True, 
         pin_memory=True
     )
@@ -143,7 +142,7 @@ def train(logger, model, datasets, args, cfg, device):
             if cfg.MODEL.MODALITY == 'range':
                 scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)
                 
-            elif cfg.MODEL.MODALITY == 'voxel':
+            elif cfg.MODEL.MODALITY == 'voxel' or cfg.MODEL.MODALITY == 'cylinder':
                 map_data_to_gpu(data)
 
             optimizer.zero_grad()
@@ -156,7 +155,7 @@ def train(logger, model, datasets, args, cfg, device):
                     if logits.size()[-1] != label.size()[-1] and logits.size()[-2] != label.size()[-2]:
                         logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)  # [bs, cls, H, W]
 
-                elif cfg.MODEL.MODALITY == 'voxel':
+                elif cfg.MODEL.MODALITY == 'voxel' or cfg.MODEL.MODALITY == 'cylinder':
                     logits, label = model(data)  # [uniq, cls], [uniq]
 
                 pixel_losses = WCE(logits, label)

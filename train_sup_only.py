@@ -140,15 +140,15 @@ def main():
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
                 ),
             ]
-        elif cfg.MODEL.MODALITY == 'voxel':
+        elif cfg.MODEL.MODALITY == 'cylinder':
             from data.semantickitti.semantickitti import SemkittiCylinderDatabase
             datasets = [
                 SemkittiCylinderDatabase(
                     args.root_semkitti, 'train', 
                     data_split=cfg.DATA.SPLIT,
-                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
                     max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
                     min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
                     augment='GlobalAugment',
                     if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
@@ -156,9 +156,33 @@ def main():
                 SemkittiCylinderDatabase(
                     args.root_semkitti, 'val', 
                     data_split='full',
-                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
                     max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
                     min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                    augment='NoAugment',
+                    if_scribble=False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                ),
+            ]
+        elif cfg.MODEL.MODALITY == 'voxel':
+            from data.semantickitti.semantickitti import SemkittiVoxelDatabase
+            datasets = [
+                SemkittiVoxelDatabase(
+                    args.root_semkitti, 'train', 
+                    data_split=cfg.DATA.SPLIT,
+                    max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
+                    min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
+                    augment='GlobalAugment',
+                    if_scribble=True if cfg.DATA.DATASET == 'scribblekitti' else False,
+                    if_sup_only=cfg.DATA.IF_SUP_ONLY,
+                ),
+                SemkittiVoxelDatabase(
+                    args.root_semkitti, 'val', 
+                    data_split='full',
+                    max_volume_space=cfg.DATA.MAX_VOLUME_SPACE,
+                    min_volume_space=cfg.DATA.MIN_VOLUME_SPACE,
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.SEMANTICKITTI,
                     augment='NoAugment',
                     if_scribble=False,
                     if_sup_only=cfg.DATA.IF_SUP_ONLY,
@@ -188,7 +212,7 @@ def main():
         else:
             raise NotImplementedError
 
-    elif cfg.MODEL.MODALITY == 'voxel':
+    elif cfg.MODEL.MODALITY == 'cylinder':
 
         if cfg.MODEL.BACKBONE == 'cylinder3d':
             from model.voxel.cylinder3d.network import Cylinder3D
@@ -200,6 +224,29 @@ def main():
         else:
             raise NotImplementedError
 
+    elif cfg.MODEL.MODALITY == 'voxel':
+
+        if cfg.MODEL.BACKBONE == 'minkunet':
+            from model.voxel.minkunet.network import MinkUNet
+            model = MinkUNet(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+                num_layer=cfg.MODEL.NUM_LAYER,
+                cr=cfg.MODEL.CR,
+                plane=cfg.MODEL.PLANE,
+                in_fea_dim=cfg.MODEL.NUM_IN_FEA,
+            )
+        elif cfg.MODEL.BACKBONE == 'spvcnn':
+            from model.voxel.spvcnn.network import SPVCNN
+            model = SPVCNN(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+                num_layer=cfg.MODEL.NUM_LAYER,
+                cr=cfg.MODEL.CR,
+                plane=cfg.MODEL.PLANE,
+                in_fea_dim=cfg.MODEL.NUM_IN_FEA,
+            )
+        else:
+            raise NotImplementedError
+    
     else:
         raise NotImplementedError
     

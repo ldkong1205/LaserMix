@@ -2,13 +2,18 @@ import cv2
 import glob
 import random
 import yaml
+from collections import defaultdict
+from itertools import accumulate
 
 import numba as nb
 import numpy as np
 import torch
 from torch.utils import data
 from torchvision.transforms import functional as F
+
+from torchsparse import SparseTensor
 from torchsparse.utils.quantize import sparse_quantize
+from torchsparse.utils.collate import sparse_collate_fn
 
 from data.semantickitti.laserscan import SemLaserScan
 from data.semantickitti.pointcloud import SemkittiDataset
@@ -219,32 +224,15 @@ class SemkittiRangeViewDatabase(data.Dataset):
         return depth_map
 
 
-@nb.jit('u1[:,:,:](u1[:,:,:],i8[:,:])', nopython=True, cache=True, parallel=False)
-def nb_process_label(processed_label, sorted_label_voxel_pair):
-    label_size = 256
-    counter = np.zeros((label_size,), dtype=np.uint16)
-    counter[sorted_label_voxel_pair[0, 3]] = 1
-    cur_sear_ind = sorted_label_voxel_pair[0, :3]
-    for i in range(1, sorted_label_voxel_pair.shape[0]):
-        cur_ind = sorted_label_voxel_pair[i, :3]
-        if not np.all(np.equal(cur_ind, cur_sear_ind)):
-            processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
-            counter = np.zeros((label_size,), dtype=np.uint16)
-            cur_sear_ind = cur_ind
-        counter[sorted_label_voxel_pair[i, 3]] += 1
-    processed_label[cur_sear_ind[0], cur_sear_ind[1], cur_sear_ind[2]] = np.argmax(counter)
-    return processed_label
-
-
 class SemkittiCylinderDatabase(data.Dataset):
     def __init__(
         self,
         root: str,
         split: str,
         data_split: str = None,
-        voxel_grid_size: list = [240, 180, 32],
         max_volume_space: list = [50, 180, 2],
         min_volume_space: list = [0, -180, -4],
+        voxel_grid_size: list = [240, 180, 32],
         augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
@@ -265,7 +253,7 @@ class SemkittiCylinderDatabase(data.Dataset):
         )
 
         if self.augment == 'GlobalAugment':
-            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = True, True, True, True, True
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, True, True, True, True
         elif self.augment == 'NoAugment':
             self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, False, False, False, False
         else:
@@ -327,6 +315,7 @@ class SemkittiCylinderDatabase(data.Dataset):
             rand_jitter = np.clip(np.random.normal(0, jitter, 3), -3 * jitter, 3 * jitter)
             points[:, :3] += rand_jitter
 
+        # voxelization
         xyz_pol = self.cart2polar(points)
         xyz_pol[:, 1] = xyz_pol[:, 1] / np.pi * 180.
 
@@ -359,6 +348,45 @@ class SemkittiCylinderDatabase(data.Dataset):
             'num_points': np.array([points.shape[0]]),
         }
 
+    @staticmethod
+    def collate_batch(data):
+        data_dict = defaultdict(list)
+        for sample in data:
+            for key, val in sample.items():
+                data_dict[key].append(val)
+        
+        batch_size = len(data)
+        batch_data = {}
+        point_coord = []
+        voxel_coord = []
+
+        for i in range(batch_size):
+            point_coord.append(
+                np.pad(data_dict['point_coord'][i], ((0, 0), (0, 1)),
+                mode='constant', constant_values=i)
+            )
+            voxel_coord.append(
+                np.pad(data_dict['voxel_coord'][i], ((0, 0), (0, 1)),
+                mode='constant', constant_values=i)
+            )
+
+        batch_data['point_coord'] = torch.from_numpy(np.concatenate(point_coord)).type(torch.LongTensor)
+        batch_data['voxel_coord'] = torch.from_numpy(np.concatenate(voxel_coord)).type(torch.LongTensor)
+
+        batch_data['point_fea'] = torch.from_numpy(np.concatenate(data_dict['point_fea'])).type(torch.FloatTensor)
+        batch_data['voxel_fea'] = torch.from_numpy(np.concatenate(data_dict['voxel_fea'])).type(torch.FloatTensor)
+
+        batch_data['point_label'] = torch.from_numpy(np.concatenate(data_dict['point_label'])).type(torch.LongTensor)
+        batch_data['voxel_label'] = torch.from_numpy(np.concatenate(data_dict['voxel_label'])).type(torch.LongTensor)
+
+        batch_data['inverse_map'] = torch.from_numpy(np.concatenate(data_dict['inverse_map'])).type(torch.LongTensor)
+        batch_data['num_points'] = torch.from_numpy(np.concatenate(data_dict['num_points'])).type(torch.LongTensor)
+
+        offset = [sample['voxel_coord'].shape[0] for sample in data] 
+        batch_data['offset'] = torch.tensor(list(accumulate(offset))).int()
+
+        return batch_data
+
     def cart2polar(self, input_xyz):
         rho = np.sqrt(input_xyz[:, 0] ** 2 + input_xyz[:, 1] ** 2)
         phi = np.arctan2(input_xyz[:, 1], input_xyz[:, 0])
@@ -389,9 +417,9 @@ class SemkittiVoxelDatabase(data.Dataset):
         root: str,
         split: str,
         data_split: str = None,
-        voxel_grid_size: list = [240, 180, 32],
         max_volume_space: list = [50, 180, 2],
         min_volume_space: list = [0, -180, -4],
+        voxel_grid_size: float = 0.05,
         augment: str = 'NoAugment',
         if_scribble: bool = False,
         if_sup_only: bool = False,
@@ -400,7 +428,7 @@ class SemkittiVoxelDatabase(data.Dataset):
     ):
         super().__init__()
         self.root = root
-        self.voxel_grid_size = np.array(voxel_grid_size)
+        self.voxel_grid_size = voxel_grid_size
         self.augment = augment
 
         self.point_cloud_dataset = SemkittiDataset(
@@ -412,7 +440,7 @@ class SemkittiVoxelDatabase(data.Dataset):
         )
 
         if self.augment == 'GlobalAugment':
-            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = True, True, True, True, True
+            self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, True, True, True, True
         elif self.augment == 'NoAugment':
             self.if_drop, self.if_flip, self.if_scale, self.if_rotate, self.if_jitter = False, False, False, False, False
         else:
@@ -474,25 +502,40 @@ class SemkittiVoxelDatabase(data.Dataset):
             rand_jitter = np.clip(np.random.normal(0, jitter, 3), -3 * jitter, 3 * jitter)
             points[:, :3] += rand_jitter
 
-        xyz_pol = points[:, :3]
-        point_coord = np.round(points[:, :3] / 0.05).astype(np.int32)
-        point_coord -= point_coord.min(0, keepdims=1)
+        # voxelization
+        pc_ = np.round(points[:, :3] / self.voxel_grid_size).astype(np.int32)
+        pc_ -= pc_.min(0, keepdims=1)
+        fea_ = points
 
-        voxel_coord, voxel_label, inds, inverse_map = voxelize_with_label(
-            n_cls=self.n_cls, point_coord=point_coord, point_label=point_label,
+        _, inds, inverse_map = sparse_quantize(
+            pc_,
+            return_index=True,
+            return_inverse=True,
         )
 
-        voxel_fea = np.concatenate([xyz_pol[inds], points[inds][:, 3:]], axis=1)
-        point_fea = np.concatenate([xyz_pol, points[:, 3:]], axis=1)
+        pc = pc_[inds]  # [N, 3]
+        fea = fea_[inds]  # [N, 4]
+        label = point_label[inds]  # [N,]
+        
+        point_fea = SparseTensor(fea, pc)
+        label = SparseTensor(label, pc)
+        label_mapped = SparseTensor(point_label, pc_)
+        inverse_map = SparseTensor(inverse_map, pc_)
         
         return {
-            'point_fea': point_fea.astype(np.float32),
-            'voxel_fea': voxel_fea.astype(np.float32),
-            'point_coord': point_coord.astype(np.float32),
-            'voxel_coord': voxel_coord.astype(np.int),
-            'point_label': point_label.astype(np.int),
-            'voxel_label': voxel_label.astype(np.int),
-            'inverse_map': inverse_map.astype(np.int),
+            'point_fea': point_fea,
+            'point_label': label,
+            'point_label_mapped': label_mapped,
+            'inverse_map': inverse_map,
         }
+
+    @staticmethod
+    def collate_batch(data):
+        offset = [sample['point_fea'].C.shape[0] for sample in data]
+        batch_data = sparse_collate_fn(data)
+        batch_data.update(dict(
+            offset=torch.tensor(list(accumulate(offset))).int()
+        ))
+        return batch_data
 
 
