@@ -604,3 +604,41 @@ def map_data_to_gpu(batch_dict):
             batch_dict[key] = val
         else:
             raise ValueError("Invalid type of batch_dict.")
+
+
+def linear_warmup_with_cosdecay(cur_step, warmup_steps, total_steps, min_scale=1e-5):
+    if cur_step < warmup_steps:
+        return (1 - min_scale) * cur_step / warmup_steps + min_scale
+    else:
+        ratio = (cur_step - warmup_steps) / total_steps
+        return (1 - min_scale) * 0.5 * (1 + np.cos(np.pi * ratio)) + min_scale
+
+
+def cos_warmup_with_cosdecay(cur_step, warmup_steps, total_steps, min_scale=1e-5):
+    if cur_step < warmup_steps:
+        return (1 - min_scale) * (1 - np.cos(np.pi * cur_step / warmup_steps)) / 2 + min_scale
+    else:
+        ratio = (cur_step - warmup_steps) / total_steps
+        return (1 - min_scale) * 0.5 * (1 + np.cos(np.pi * ratio)) + min_scale
+
+
+def linear_warmup_with_stepdecay(cur_step, warmup_steps, total_steps, decay_steps, decay_scales):
+    if cur_step < warmup_steps:
+        return cur_step / warmup_steps
+    else:
+        cur_decay = 1
+        for i in range(len(decay_steps)):
+            if cur_step >= decay_steps[i]:
+                cur_decay = cur_decay * decay_scales[i]
+        return cur_decay
+
+
+def coswarmup_with_stepdecay(cur_step, warmup_steps, total_steps, decay_steps, decay_scales):
+    if cur_step < warmup_steps:
+        return (1 - np.cos(np.pi * cur_step / warmup_steps)) / 2
+    else:
+        cur_decay = 1
+        for i in range(len(decay_steps)):
+            if cur_step >= decay_steps[i]:
+                cur_decay = cur_decay * decay_scales[i]
+        return cur_decay

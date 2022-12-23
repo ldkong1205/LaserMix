@@ -4,7 +4,7 @@ import torch
 from torch.nn import functional as F
 
 from script.trainer.utils import ClassWeightSemikitti, CrossEntropyDiceLoss, Lovasz_softmax, BoundaryLoss
-from script.trainer.utils import map_data_to_gpu
+from script.trainer.utils import map_data_to_gpu, linear_warmup_with_cosdecay
 from script.trainer.validator import validate
 from script.evaluator.avgmeter import AverageMeter
 from script.evaluator.ioueval import iouEval
@@ -53,6 +53,8 @@ def train(logger, model, datasets, args, cfg, device):
             model.parameters(),
             lr=cfg.OPTIM.LEARNING_RATE,
             momentum=0.9,
+            weight_decay=0.0001,
+            nesterov=True,
         )
     else:
         raise NotImplementedError
@@ -69,6 +71,13 @@ def train(logger, model, datasets, args, cfg, device):
             cycle_momentum=True,
             div_factor=25.0,
             final_div_factor=100.0
+        )
+    elif cfg.OPTIM.SCHEDULER == 'lambda':
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            optimizer,
+            lr_lambda=lambda x: linear_warmup_with_cosdecay(
+                x, int(num_batch_train) * cfg.TRAIN.WARMUP_EPOCHS, int(num_batch_train) * cfg.TRAIN.NUM_EPOCHS
+            ),
         )
     elif cfg.OPTIM.SCHEDULER == 'step':
         scheduler = torch.optim.lr_scheduler.StepLR(

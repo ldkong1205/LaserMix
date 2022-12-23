@@ -23,6 +23,7 @@ MODEL:
 
 TRAIN:
     NUM_EPOCHS: 20  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
+    WARMUP_EPOCHS: 1
     BATCH_SIZE: 16
     NUM_WORKERS: 8
 
@@ -37,8 +38,8 @@ OPTIM:
     IF_BD_LOSS: False
     TOP_K_PERCENT_PIXELS: 1.0
     OPTIMIZER: 'sgd'  # choices: ['adamw', 'sgd']
-    LEARNING_RATE: 0.1
-    SCHEDULER: 'onecycle'  # choices: ['onecycle', 'step']
+    LEARNING_RATE: 0.2
+    SCHEDULER: 'lambda'  # choices: ['onecycle', 'lambda', 'step']
 
 GENERAL:
     SEED: 1205
