@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/voxel.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/range.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -209,13 +209,25 @@ def main():
                 num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
                 aux=False,
             )
+        elif cfg.MODEL.BACKBONE == 'rangenet':
+            from model.range.rangenet.network import RangeNet
+            model = RangeNet(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+                if_CRF=False,
+                H=args.H, W=args.W,
+            )
+        elif cfg.MODEL.BACKBONE == 'salsanext':
+            from model.range.salsanext.network import SalsaNext
+            model = SalsaNext(
+                num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
+            )
         else:
             raise NotImplementedError
 
     elif cfg.MODEL.MODALITY == 'cylinder':
 
         if cfg.MODEL.BACKBONE == 'cylinder3d':
-            from model.voxel.cylinder3d.network import Cylinder3D
+            from model.cylinder.cylinder3d.network import Cylinder3D
             model = Cylinder3D(
                 num_cls=16+1 if cfg.DATA.DATASET == 'nuscenes' else 19+1,
                 in_fea_dim=cfg.MODEL.NUM_IN_FEA,

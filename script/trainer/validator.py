@@ -42,7 +42,7 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
             if cfg.MODEL.MODALITY == 'range':
                 scan, label = data['scan'].to(device), torch.squeeze(data['label'], dim=1).to(device)
 
-            elif cfg.MODEL.MODALITY == 'voxel':
+            elif cfg.MODEL.MODALITY == 'voxel' or cfg.MODEL.MODALITY == 'cylinder':
                 map_data_to_gpu(data)
 
             with torch.cuda.amp.autocast(enabled=args.amp):
@@ -50,10 +50,10 @@ def validate(logger, loader_val, evaluator, model, criterion, info, args, cfg, d
                 if cfg.MODEL.MODALITY == 'range':
                     logits = model(scan)
                     if logits.size()[-1] != label.size()[-1] and logits.size()[-2] != label.size()[-2]:
-                        logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)  # [bs, cls, H, W]
+                        logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)
                     
-                elif cfg.MODEL.MODALITY == 'voxel':
-                    logits, label = model(data)  # [uniq, cls], [uniq]
+                elif cfg.MODEL.MODALITY == 'voxel' or cfg.MODEL.MODALITY == 'cylinder':
+                    logits, label = model(data)
                 
                 wce  = criterion[0](logits, label).contiguous().view(-1).mean()
                 jacc = criterion[1](F.softmax(logits, dim=1), label)

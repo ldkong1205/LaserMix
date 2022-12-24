@@ -162,10 +162,10 @@ def train(logger, model, datasets, args, cfg, device):
                 if cfg.MODEL.MODALITY == 'range':
                     logits = model(scan)
                     if logits.size()[-1] != label.size()[-1] and logits.size()[-2] != label.size()[-2]:
-                        logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)  # [bs, cls, H, W]
+                        logits = F.interpolate(logits, size=label.size()[1:], mode='bilinear', align_corners=True)
 
                 elif cfg.MODEL.MODALITY == 'voxel' or cfg.MODEL.MODALITY == 'cylinder':
-                    logits, label = model(data)  # [uniq, cls], [uniq]
+                    logits, label = model(data)
 
                 pixel_losses = WCE(logits, label)
                 pixel_losses = pixel_losses.contiguous().view(-1)

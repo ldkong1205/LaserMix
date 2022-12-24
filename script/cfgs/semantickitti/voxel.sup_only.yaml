@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'voxel.sup_only'
-SUFFIX: '_spvcnn'
+SUFFIX: '_minkunetx1.0_lambda_0.2'
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
@@ -11,7 +11,7 @@ DATA:
 
 MODEL:
     MODALITY: 'voxel'
-    BACKBONE: 'spvcnn'  # choices: ['minkunet', 'spvcnn']
+    BACKBONE: 'minkunet'  # choices: ['minkunet', 'spvcnn']
     RESOLUTION:
         NUSCENES: 0.1
         SEMANTICKITTI: 0.05
