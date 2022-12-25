@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'voxel.sup_only'
-SUFFIX: '_minkunetx1.0_lambda_0.2'
+SUFFIX: '_spvcnn_32epochs_onecycle'
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
@@ -11,7 +11,7 @@ DATA:
 
 MODEL:
     MODALITY: 'voxel'
-    BACKBONE: 'minkunet'  # choices: ['minkunet', 'spvcnn']
+    BACKBONE: 'spvcnn'  # choices: ['minkunet', 'spvcnn']
     RESOLUTION:
         NUSCENES: 0.1
         SEMANTICKITTI: 0.05
@@ -22,8 +22,8 @@ MODEL:
     PLANE: [32, 32, 64, 128, 256, 256, 128, 96, 96]
 
 TRAIN:
-    NUM_EPOCHS: 20  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
-    WARMUP_EPOCHS: 1
+    NUM_EPOCHS: 30  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [15, 30, 45, 60]
+    WARMUP_EPOCHS: 2
     BATCH_SIZE: 16
     NUM_WORKERS: 8
 

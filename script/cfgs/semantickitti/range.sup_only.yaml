@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'range.sup_only'
-SUFFIX: '_salsanext'
+SUFFIX: ''
 
 DATA:
     DATASET: 'semantickitti'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
@@ -9,21 +9,21 @@ DATA:
 
 MODEL:
     MODALITY: 'range'
-    BACKBONE: 'salsanext'  # choices: ['fidnet', 'cenet', 'rangenet++', 'salsanext']
+    BACKBONE: 'cenet'  # choices: ['fidnet', 'cenet', 'rangenet++', 'salsanext']
     RESOLUTION:
         NUSCENES: [32, 1920]
         SEMANTICKITTI: [64, 1920]
         SCRIBBLEKITTI: [64, 1920]
 
 TRAIN:
-    NUM_EPOCHS: 20  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
+    NUM_EPOCHS: 30  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [15, 30, 45, 60]
     BATCH_SIZE: 32
     NUM_WORKERS: 8
 
 VALID:
     BATCH_SIZE: 32
     NUM_WORKERS: 8
-    EPOCH_START_VAL: 1
+    EPOCH_START_VAL: 0
 
 OPTIM:
     LOSS: 'dice'  # choices: ['wce', 'dice']
