@@ -73,7 +73,7 @@
    <tr>
       <td>CENet</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td>40.4</td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
    <tr>
