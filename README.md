@@ -194,6 +194,10 @@ Please refer to [GET_STARTED.md](docs/GET_STARTED.md) to learn more usage about 
 
 ![qualitative](docs/figs/qualitative.png)
 
+### Checkpoints & More Results
+
+For more experimental results and pretrained weights, please refer to [RESULT.md](docs/RESULT.md).
+
 
 ## TODO List
 
