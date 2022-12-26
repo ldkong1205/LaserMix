@@ -81,7 +81,7 @@ make
 make install
 ```
 
-- Compile `torchsparse`
+- Compile `torchsparse` (Hint: Make sure you have access to GPU machines when compiling)
 ```Shell
 cd ..
 pip install ./torchsparse
