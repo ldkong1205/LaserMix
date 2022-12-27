@@ -72,8 +72,8 @@
    </tr>
    <tr>
       <td>CENet</td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td>40.4</td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td>40.4</td> <td> </td> <td> </td> <td> </td> <td>71.7</td>
+      <td>40.4</td> <td>56.0</td> <td>58.2</td> <td>60.1</td> <td>61.3</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
    <tr>
@@ -127,8 +127,8 @@
    <tr>
       <td>SPVCNN</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td>42.7</td> <td> </td> <td> </td> <td> </td> <td>63.2</td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td>42.7</td> <td>57.5</td> <td>60.2</td> <td>62.7</td> <td>63.2</td>
+      <td>38.2</td> <td> </td> <td> </td> <td> </td> <td>56.7</td>
    </tr>
    <tr>
       <td><strong><i>w/</i> LaserMix</strong></td>
