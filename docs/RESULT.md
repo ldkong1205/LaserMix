@@ -54,26 +54,26 @@
    </tr>
    <tr>
       <td>FIDNet</td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td>38.3</td> <td>57.5</td> <td>62.7</td> <td>67.6</td> <td> </td>
+      <td>36.2</td> <td>52.2</td> <td>55.9</td> <td>57.2</td> <td> </td>
+      <td>33.1</td> <td>47.7</td> <td>49.9</td> <td>52.5</td> <td> </td>
    </tr>
    <tr>
       <td><strong><i>w/</i> LaserMix</strong></td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td>49.5</td> <td>68.2</td> <td>70.6</td> <td>73.0</td> <td> </td>
+      <td>43.4</td> <td>58.8</td> <td>59.4</td> <td>61.4</td> <td> </td>
+      <td>38.3</td> <td>54.4</td> <td>55.6</td> <td>58.7</td> <td> </td>
    </tr>
    <tr>
       <td><i>improv.</i> &#8593</td>
-      <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
-      <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
-      <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
+      <td><sup>+</sup>11.2</td> <td><sup>+</sup>10.7</td> <td><sup>+</sup>7.9</td> <td><sup>+</sup>5.4</td> <td><sup>+</sup></td>
+      <td><sup>+</sup>7.2</td> <td><sup>+</sup>6.6</td> <td><sup>+</sup>3.5</td> <td><sup>+</sup>4.2</td> <td><sup>+</sup></td>
+      <td><sup>+</sup>5.2</td> <td><sup>+</sup>6.7</td> <td><sup>+</sup>5.7</td> <td><sup>+</sup>6.2</td> <td><sup>+</sup></td>
    </tr>
    <tr>
       <td>CENet</td>
       <td>40.4</td> <td> </td> <td> </td> <td> </td> <td>71.7</td>
-      <td>40.4</td> <td>56.0</td> <td>58.2</td> <td>60.1</td> <td>61.3</td>
+      <td>40.4</td> <td>56.0</td> <td>58.2</td> <td>60.1</td> <td>62.9</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
    <tr>
@@ -109,7 +109,7 @@
    <tr>
       <td>MinkUNet</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td>62.8</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
    <tr>
