@@ -188,6 +188,8 @@ def train(logger, model, datasets, args, cfg, device):
                     loss_bd = 0.
 
                 loss = 1.0 * loss_ce + 3.0 * loss_ls.mean() + 1.0 * loss_bd
+            
+            assert torch.isnan(loss).sum() == 0
 
             if args.amp:
                 scaler.scale(loss).backward()

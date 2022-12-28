@@ -74,55 +74,16 @@ class LidarSegRangeViewDataset(data.Dataset):
             'name': idx_rv,
         }
 
+
+    def pull_item(self, token: str) -> Tuple[torch.Tensor, torch.Tensor, np.ndarray]:
+        rv, label_rv, idx_rv = self.pull_item_core(token)
+        rv = torch.from_numpy(rv).permute(2, 0, 1).float()  # [6, H, W]
+        label_rv = torch.from_numpy(label_rv.astype(int))   # [H, W]
+
+        return rv, label_rv, idx_rv
     
-    def RangePaste(self, rv, label_rv, rv_, label_rv_):
-        rv_new = rv.detach().clone()
-        label_rv_new = label_rv.detach().clone()
 
-        pix_barrier = label_rv_ == 1  # cls: 1 (barrier)
-        if torch.sum(pix_barrier) > 2:
-            rv_new[:, pix_barrier]  = rv_[:, pix_barrier]
-            label_rv_new[pix_barrier] = label_rv_[pix_barrier]
-        
-        pix_bicycle = label_rv_ == 2  # cls: 2 (bicycle)
-        if torch.sum(pix_bicycle) > 2:
-            rv_new[:, pix_bicycle]  = rv_[:, pix_bicycle]
-            label_rv_new[pix_bicycle] = label_rv_[pix_bicycle]
-        
-        pix_construction_vehicle = label_rv_ == 5  # cls: 5 (construction_vehicle)
-        if torch.sum(pix_construction_vehicle) > 2:
-            rv_new[:, pix_construction_vehicle]  = rv_[:, pix_construction_vehicle]
-            label_rv_new[pix_construction_vehicle] = label_rv_[pix_construction_vehicle]
-
-        pix_motorcycle = label_rv_ == 6  # cls: 6 (motorcycle)
-        if torch.sum(pix_motorcycle) > 2:
-            rv_new[:, pix_motorcycle]  = rv_[:, pix_motorcycle]
-            label_rv_new[pix_motorcycle] = label_rv_[pix_motorcycle]
-
-        pix_pedestrian = label_rv_ == 7  # cls: 7 (pedestrian)
-        if torch.sum(pix_pedestrian) > 2:
-            rv_new[:, pix_pedestrian]  = rv_[:, pix_pedestrian]
-            label_rv_new[pix_pedestrian] = label_rv_[pix_pedestrian]
-        
-        pix_traffic_cone = label_rv_ == 8  # cls: 8 (traffic_cone)
-        if torch.sum(pix_traffic_cone) > 2:
-            rv_new[:, pix_traffic_cone]  = rv_[:, pix_traffic_cone]
-            label_rv_new[pix_traffic_cone] = label_rv_[pix_traffic_cone]
-
-        pix_trailer = label_rv_ == 9  # cls: 9 (trailer)
-        if torch.sum(pix_trailer) > 2:
-            rv_new[:, pix_trailer]  = rv_[:, pix_trailer]
-            label_rv_new[pix_trailer] = label_rv_[pix_trailer]
-
-        pix_flat_other = label_rv_ == 12  # cls: 12 (flat_other)
-        if torch.sum(pix_flat_other) > 2:
-            rv_new[:, pix_flat_other]  = rv_[:, pix_flat_other]
-            label_rv_new[pix_flat_other] = label_rv_[pix_flat_other]
-
-        return rv_new, label_rv_new
-
-
-    def load_data(self, token: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def load_data(self, token: str) -> Dict:
         return self.db.load_from_db(token)
 
 
@@ -156,14 +117,6 @@ class LidarSegRangeViewDataset(data.Dataset):
         if self.scale is not None:
             rv[lidar_mask, :-1] = rv[lidar_mask, :-1] / self.scale
         
-        return rv, label_rv, idx_rv
-
-
-    def pull_item(self, token: str) -> Tuple[torch.Tensor, torch.Tensor, np.ndarray]:
-        rv, label_rv, idx_rv = self.pull_item_core(token)
-        rv = torch.from_numpy(rv).permute(2, 0, 1).float()  # [6, H, W]
-        label_rv = torch.from_numpy(label_rv.astype(int))   # [H, W]
-
         return rv, label_rv, idx_rv
 
 

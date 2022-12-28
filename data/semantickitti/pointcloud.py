@@ -126,9 +126,17 @@ class SemkittiDataset(data.Dataset):
                 self.lidar_list = self.lidar_list_unlabeled
                 self.label_list = self.label_list_unlabeled
 
+        else:
+            print("Loading '{}' labeled samples from SemanticKITTI under '{}' split ...".format(
+                len(set(self.lidar_list)), self.split)
+            )
+
         if self.if_scribble:
             self.label_list = [i.replace("SemanticKITTI", "ScribbleKITTI") for i in self.label_list]
             self.label_list = [i.replace("labels", "scribbles") for i in self.label_list]
+            print("Loading '{}' weakly-annotated labels from ScribbleKITTI under '{}' split ...".format(
+                len(set(self.label_list)), self.split)
+            )
 
     def __len__(self):
         'Denotes the total number of samples'

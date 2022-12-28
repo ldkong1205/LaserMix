@@ -1,0 +1,47 @@
+# TRAINING CONFIG
+EXP_NAME: 'voxel.sup_only'
+SUFFIX: '_spvcnn'
+
+DATA:
+    DATASET: 'nuscenes'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
+    SPLIT: 'full'  # choices: ['1pct', '10pct', '20pct', '50pct', 'full']
+    IF_SUP_ONLY: True
+    MAX_VOLUME_SPACE: [50, 180, 2]
+    MIN_VOLUME_SPACE: [0, -180, -4]
+
+MODEL:
+    MODALITY: 'voxel'
+    BACKBONE: 'spvcnn'  # choices: ['minkunet', 'spvcnn']
+    RESOLUTION:
+        NUSCENES: 0.1
+        SEMANTICKITTI: 0.05
+        SCRIBBLEKITTI: 0.05
+    NUM_IN_FEA: 4
+    NUM_LAYER: [2, 2, 2, 2, 2, 2, 2, 2]
+    CR: 1.0
+    PLANE: [32, 32, 64, 128, 256, 256, 128, 96, 96]
+
+TRAIN:
+    NUM_EPOCHS: 64  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [16, 32, 48, 64]
+    WARMUP_EPOCHS: 2
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
+
+VALID:
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
+    EPOCH_START_VAL: 0
+
+OPTIM:
+    LOSS: 'wce'  # choices: ['wce', 'dice']
+    IF_LS_LOSS: True
+    IF_BD_LOSS: False
+    TOP_K_PERCENT_PIXELS: 1.0
+    OPTIMIZER: 'sgd'  # choices: ['adamw', 'sgd']
+    LEARNING_RATE: 0.2
+    SCHEDULER: 'lambda'  # choices: ['onecycle', 'lambda', 'step']
+
+GENERAL:
+    SEED: 1205
+
+

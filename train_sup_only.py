@@ -15,7 +15,7 @@ from script.trainer.utils import get_n_params
 def get_args():
     parser = argparse.ArgumentParser(description='Train a segmentor')
     # == general configs ==
-    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/semantickitti/range.sup_only.yaml',
+    parser.add_argument('--cfg-dir', type=str, default='script/cfgs/nuscenes/voxel.sup_only.yaml',
                         help='path to config file.')
     parser.add_argument('--log-dir', 
                         help='path to save log and ckpts.', default='./logs/')
@@ -28,7 +28,7 @@ def get_args():
                         help='name of the dataset we are going to use.')
     # -- for nuScenes --
     parser.add_argument('--root_nusc', type=str, 
-                        help='file root path for the nuScenes database.', default='/nvme/share/data/sets/nuScenes')
+                        help='file root path for the nuScenes database.', default='/nvme/share/data/sets/nuScenes-mini')
     parser.add_argument('--horiz_angular_res', type=float,
                         help='resolution of horizontal angular.', default=0.1875)
     # -- for SemanticKITTI --
@@ -86,13 +86,13 @@ def main():
     if cfg.DATA.DATASET == 'nuscenes':
         from nuscenes.nuscenes import NuScenes as nuScenes
         from data.nuscenes.nusc import NuscLidarSegDatabase
-        from data.nuscenes.dataset_rv import LidarSegRangeViewDataset
 
-        raw_db = nuScenes('v1.0-trainval', args.root_nusc, True, 0.1)
+        # raw_db = nuScenes('v1.0-trainval', args.root_nusc, True, 0.1)
+        raw_db = nuScenes('v1.0-mini', args.root_nusc, True, 0.1)
         database_train = NuscLidarSegDatabase(
             nusc_db=raw_db, 
             label_mapping_name='official',
-            split='train',
+            split='mini_train',
             min_distance=0.9,
             data_split=cfg.DATA.SPLIT,
             if_sup_only=cfg.DATA.IF_SUP_ONLY,
@@ -100,23 +100,42 @@ def main():
         database_val = NuscLidarSegDatabase(
             nusc_db=raw_db, 
             label_mapping_name='official',
-            split='val',
+            split='mini_val',
             min_distance=0.9,
             data_split='full',
             if_sup_only=cfg.DATA.IF_SUP_ONLY,
         )
-        datasets = [
-            LidarSegRangeViewDataset(
-                database_train,
-                augment='GlobalAugment',
-                horiz_angular_res=args.horiz_angular_res,
-            ),
-            LidarSegRangeViewDataset(
-                database_val,
-                augment='NoAugment',
-                horiz_angular_res=args.horiz_angular_res,
-            ),
-        ]
+        if cfg.MODEL.MODALITY == 'range':
+            from data.nuscenes.dataset_rv import LidarSegRangeViewDataset
+            datasets = [
+                LidarSegRangeViewDataset(
+                    database_train,
+                    augment='GlobalAugment',
+                    horiz_angular_res=args.horiz_angular_res,
+                ),
+                LidarSegRangeViewDataset(
+                    database_val,
+                    augment='NoAugment',
+                    horiz_angular_res=args.horiz_angular_res,
+                ),
+            ]
+        elif cfg.MODEL.MODALITY == 'voxel':
+            from data.nuscenes.dataset_voxel import LidarSegVoxelDataset
+            datasets = [
+                LidarSegVoxelDataset(
+                    database_train,
+                    augment='GlobalAugment',
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.NUSCENES,
+                ),
+                LidarSegVoxelDataset(
+                    database_val,
+                    augment='NoAugment',
+                    voxel_grid_size=cfg.MODEL.RESOLUTION.NUSCENES,
+                ),
+            ]
+        else:
+            raise NotImplementedError
+        
     
     elif cfg.DATA.DATASET == 'semantickitti' or cfg.DATA.DATASET == 'scribblekitti':
 

@@ -1,6 +1,6 @@
 # TRAINING CONFIG
 EXP_NAME: 'range.sup_only'
-SUFFIX: '_cenet'
+SUFFIX: '_test'
 
 DATA:
     DATASET: 'nuscenes'  # choices: ['nuscenes', 'semantickitti', 'scribblekitti']
@@ -16,13 +16,13 @@ MODEL:
         SCRIBBLEKITTI: [64, 1920]
 
 TRAIN:
-    NUM_EPOCHS: 100  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
-    BATCH_SIZE: 32
-    NUM_WORKERS: 8
+    NUM_EPOCHS: 2  # 'nuscenes': [25, 50, 75, 100], 'semantickitti'/'scribblekitti': [10, 20, 30, 40]
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
 
 VALID:
-    BATCH_SIZE: 32
-    NUM_WORKERS: 8
+    BATCH_SIZE: 1
+    NUM_WORKERS: 0
     EPOCH_START_VAL: 0
 
 OPTIM:
