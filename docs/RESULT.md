@@ -16,8 +16,10 @@
       <td>1%</td> <td>10%</td> <td>20%</td> <td>50%</td> <td>Full</td>
       <td>1%</td> <td>10%</td> <td>20%</td> <td>50%</td> <td>Full</td>
    </tr>
+   
+   
    <tr>
-      <td>RangeNet++</td>
+      <td><a href="https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf">RangeNet++</a></td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
@@ -35,7 +37,21 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
    </tr>
    <tr>
-      <td>SalsaNext</td>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
+   
+   <tr>
+      <td><a href="https://arxiv.org/abs/2003.03653">SalsaNext</a></td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
@@ -53,9 +69,23 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
    </tr>
    <tr>
-      <td>FIDNet</td>
-      <td>38.3</td> <td>57.5</td> <td>62.7</td> <td>67.6</td> <td> </td>
-      <td>36.2</td> <td>52.2</td> <td>55.9</td> <td>57.2</td> <td> </td>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
+   
+   <tr>
+      <td><a href="https://arxiv.org/abs/2109.03787">FIDNet</a></td>
+      <td>38.3</td> <td>57.5</td> <td>62.7</td> <td>67.6</td> <td>72.1</td>
+      <td>36.2</td> <td>52.2</td> <td>55.9</td> <td>57.2</td> <td>61.4</td>
       <td>33.1</td> <td>47.7</td> <td>49.9</td> <td>52.5</td> <td> </td>
    </tr>
    <tr>
@@ -71,8 +101,22 @@
       <td><sup>+</sup>5.2</td> <td><sup>+</sup>6.7</td> <td><sup>+</sup>5.7</td> <td><sup>+</sup>6.2</td> <td><sup>+</sup></td>
    </tr>
    <tr>
-      <td>CENet</td>
-      <td>40.4</td> <td> </td> <td> </td> <td> </td> <td>71.7</td>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
+   
+   <tr>
+      <td><a href="https://arxiv.org/abs/2207.12691">CENet</a></td>
+      <td>40.4</td> <td>58.7</td> <td> </td> <td> </td> <td>71.7</td>
       <td>40.4</td> <td>56.0</td> <td>58.2</td> <td>60.1</td> <td>62.9</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
@@ -88,6 +132,19 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
    </tr>
+   <tr>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
 </table>
 
 
@@ -106,11 +163,13 @@
       <td>1%</td> <td>10%</td> <td>20%</td> <td>50%</td> <td>Full</td>
       <td>1%</td> <td>10%</td> <td>20%</td> <td>50%</td> <td>Full</td>
    </tr>
+   
+   
    <tr>
-      <td>MinkUNet</td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td><a href="https://github.com/NVIDIA/MinkowskiEngine">MinkUNet</a></td>
+      <td> </td> <td>69.4</td> <td> </td> <td> </td> <td>72.8</td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td>62.8</td>
-      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td></td> <td></td> <td></td> <td></td> <td> </td>
    </tr>
    <tr>
       <td><strong><i>w/</i> LaserMix</strong></td>
@@ -125,10 +184,24 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
    </tr>
    <tr>
-      <td>SPVCNN</td>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
+   
+   <tr>
+      <td><a href="https://arxiv.org/pdf/2007.16100">SPVCNN</a></td>
+      <td>53.7</td> <td>69.7</td> <td>71.6</td> <td>72.0</td> <td>73.2</td>
       <td>42.7</td> <td>57.5</td> <td>60.2</td> <td>62.7</td> <td>63.2</td>
-      <td>38.2</td> <td> </td> <td> </td> <td> </td> <td>56.7</td>
+      <td>38.2</td> <td>53.8</td> <td> </td> <td> </td> <td>56.7</td>
    </tr>
    <tr>
       <td><strong><i>w/</i> LaserMix</strong></td>
@@ -143,7 +216,21 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
    </tr>
    <tr>
-      <td>Cylinder3D</td>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+   </tr>
+   
+   
+   <tr>
+      <td><a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Zhu_Cylindrical_and_Asymmetrical_3D_Convolution_Networks_for_LiDAR_Segmentation_CVPR_2021_paper.pdf">Cylinder3D</a></td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
@@ -159,6 +246,18 @@
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
       <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td> <td><sup>+</sup></td>
+   </tr>
+   <tr>
+      <td>Download</td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+      <td> </td> <td><a href="">[link]</a></td> <td> </td> <td> </td> <td><a href="">[link]</a></td>
+   </tr>
+   <tr>
+      <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
+      <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
 </table>
 
