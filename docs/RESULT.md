@@ -2,6 +2,16 @@
 
 # Experimental Result
 
+- [Track 1: Uniform Split](#track-1-uniform-split)
+   - [Range View](#range-view)
+   - [Voxel](#voxel)
+- [Track 2: Sequential Split](#track-2-sequential-split)
+   - [Range View](#range-view-1)
+   - [Voxel](#voxel-1) 
+
+## Track 1: Uniform Split
+> This track is analogous to the semi-supervised image segmentation community, which sample LiDAR scans with a uniform probability.
+
 ### Range View
 
 <table>
@@ -260,4 +270,17 @@
       <td> </td> <td> </td> <td> </td> <td> </td> <td> </td>
    </tr>
 </table>
+
+
+
+
+## Track 2: Sequential Split
+> This track takes into account the LiDAR data collection nature when sampling LiDAR scans.
+
+### Range View
+Available soon.
+
+### Voxel 
+Available soon.
+
 
