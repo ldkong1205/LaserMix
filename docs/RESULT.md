@@ -2,10 +2,10 @@
 
 # Experimental Result
 
-- [Track 1: Uniform Split](#track-1-uniform-split)
+- [**Track 1: Uniform Split**](#track-1-uniform-split)
    - [Range View](#range-view)
    - [Voxel](#voxel)
-- [Track 2: Sequential Split](#track-2-sequential-split)
+- [**Track 2: Sequential Split**](#track-2-sequential-split)
    - [Range View](#range-view-1)
    - [Voxel](#voxel-1) 
 
