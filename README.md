@@ -41,15 +41,16 @@
 </p>
 <br>
 
-Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a> to explore more details. 🚗
+Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a> to explore more details. :red_car:
 
 
 ## Updates
 
+- \[2023.02\] - LaserMix has been integrated into the [MMDetection3D](https://github.com/open-mmlab/mmdetection3d) codebase! Check [this](https://github.com/open-mmlab/mmdetection3d/pull/2302) PR to know more details. :beers:
 - \[2023.01\] - As suggested, we will establish a *sequential track* taking into account the LiDAR data collection nature in our semi-supervised LiDAR semantic segmentation benchmark. The results will be gradually updated in [RESULT.md](docs/RESULT.md).
 - \[2022.12\] - We support a wider range of LiDAR segmentation backbones, including [RangeNet++](https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf), [SalsaNext](https://arxiv.org/abs/2003.03653), [FIDNet](https://arxiv.org/abs/2109.03787), [CENet](https://arxiv.org/abs/2207.12691), [MinkowskiUNet](https://github.com/NVIDIA/MinkowskiEngine), [Cylinder3D](https://openaccess.thecvf.com/content/CVPR2021/papers/Zhu_Cylindrical_and_Asymmetrical_3D_Convolution_Networks_for_LiDAR_Segmentation_CVPR_2021_paper.pdf), and [SPVCNN](https://arxiv.org/pdf/2007.16100), under both fully- and semi-supervised settings. The checkpoints will be available soon!
-- \[2022.12\] - The derivation of spatial-prior-based SSL is available [here](https://ldkong.com/LaserMix/derivation.pdf). Take a look!
-- \[2022.08\] - LaserMix achieves 1st place among the semi-supervised semantic segmentation leaderboards of [nuScenes](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-25), [SemanticKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-24), and [ScribbleKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-23), based on [Paper-with-Code](https://paperswithcode.com/paper/lasermix-for-semi-supervised-lidar-semantic).
+- \[2022.12\] - The derivation of spatial-prior-based SSL is available [here](https://ldkong.com/LaserMix/derivation.pdf). Take a look! :memo:
+- \[2022.08\] - LaserMix achieves 1st place among the semi-supervised semantic segmentation leaderboards of [nuScenes](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-25), [SemanticKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-24), and [ScribbleKITTI](https://paperswithcode.com/sota/semi-supervised-semantic-segmentation-on-23), based on [Paper-with-Code](https://paperswithcode.com/paper/lasermix-for-semi-supervised-lidar-semantic). :bar_chart:
 - \[2022.08\] - We provide a [video demo](https://youtu.be/Xkwa5-dT0g4) for visual comparisons on the SemanticKITTI val set. Take a look!
 - \[2022.07\] - Our paper is available on arXiv, click <a href="https://arxiv.org/abs/2207.00026" target='_blank'>here</a> to check it out. Code will be available soon!
 
