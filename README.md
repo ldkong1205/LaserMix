@@ -46,6 +46,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
+- \[2023.03\] - LaserMix is accepted to [CVPR 2023](https://cvpr.thecvf.com/)! :tada:
 - \[2023.02\] - LaserMix has been integrated into the [MMDetection3D](https://github.com/open-mmlab/mmdetection3d) codebase! Check [this](https://github.com/open-mmlab/mmdetection3d/pull/2302) PR in the `dev-1.x` branch to know more details. :beers:
 - \[2023.01\] - As suggested, we will establish a *sequential track* taking into account the LiDAR data collection nature in our semi-supervised LiDAR semantic segmentation benchmark. The results will be gradually updated in [RESULT.md](docs/RESULT.md).
 - \[2022.12\] - We support a wider range of LiDAR segmentation backbones, including [RangeNet++](https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf), [SalsaNext](https://arxiv.org/abs/2003.03653), [FIDNet](https://arxiv.org/abs/2109.03787), [CENet](https://arxiv.org/abs/2207.12691), [MinkowskiUNet](https://github.com/NVIDIA/MinkowskiEngine), [Cylinder3D](https://openaccess.thecvf.com/content/CVPR2021/papers/Zhu_Cylindrical_and_Asymmetrical_3D_Convolution_Networks_for_LiDAR_Segmentation_CVPR_2021_paper.pdf), and [SPVCNN](https://arxiv.org/pdf/2007.16100), under both fully- and semi-supervised settings. The checkpoints will be available soon!
@@ -217,11 +218,11 @@ For more experimental results and pretrained weights, please refer to [RESULT.md
 If you find this work helpful, please kindly consider citing our paper:
 
 ```bibtex
-@ARTICLE{kong2022lasermix,
-  title={LaserMix for Semi-Supervised LiDAR Semantic Segmentation},
-  author={Kong, Lingdong and Ren, Jiawei and Pan, Liang and Liu, Ziwei},
-  journal={arXiv preprint arXiv:2207.00026}, 
-  year={2022},
+@inproceedings{kong2023lasermix,
+  title = {LaserMix for Semi-Supervised LiDAR Semantic Segmentation},
+  author = {Kong, Lingdong and Ren, Jiawei and Pan, Liang and Liu, Ziwei},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 
+  year = {2023},
 }
 ```
 
