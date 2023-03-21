@@ -17,16 +17,25 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2207.00026" target='_blank'>
-    <img src="https://img.shields.io/badge/Paper-%F0%9F%93%83-blue">
+    <img src="https://img.shields.io/badge/Paper-%F0%9F%93%83-yellow">
   </a>
   
   <a href="https://ldkong.com/LaserMix" target='_blank'>
-    <img src="https://img.shields.io/badge/Project-%F0%9F%94%97-yellow">
+    <img src="https://img.shields.io/badge/Project-%F0%9F%94%97-lightyellow">
+  </a>
+  
+  <a href="https://ldkong.com/LaserMix" target='_blank'>
+    <img src="https://img.shields.io/badge/Poster-%F0%9F%94%97-blue">
   </a>
   
   <a href="https://zhuanlan.zhihu.com/p/528689803" target='_blank'>
-    <img src="https://img.shields.io/badge/%E4%B8%AD%E8%AF%91%E7%89%88-%F0%9F%90%BC-red">
+    <img src="https://img.shields.io/badge/%E4%B8%AD%E8%AF%91%E7%89%88-%F0%9F%90%BC-lightblue">
   </a>
+  
+  <a href="" target='_blank'>
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=ldkong1205.LaserMix&left_color=gray&right_color=red">
+  </a>
+  
 </p>
 
 ## About
@@ -46,7 +55,8 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
-- \[2023.03\] - LaserMix is accepted to [CVPR 2023](https://cvpr.thecvf.com/)! :tada:
+- \[2023.03\] - LaserMix was selected as a **highlight** at [CVPR 2023](https://cvpr.thecvf.com/) (top 10% of accepted papers, top 2.5% of submissions).
+- \[2023.02\] - LaserMix was accepted to [CVPR 2023](https://cvpr.thecvf.com/)! :tada:
 - \[2023.02\] - LaserMix has been integrated into the [MMDetection3D](https://github.com/open-mmlab/mmdetection3d) codebase! Check [this](https://github.com/open-mmlab/mmdetection3d/pull/2302) PR in the `dev-1.x` branch to know more details. :beers:
 - \[2023.01\] - As suggested, we will establish a *sequential track* taking into account the LiDAR data collection nature in our semi-supervised LiDAR semantic segmentation benchmark. The results will be gradually updated in [RESULT.md](docs/RESULT.md).
 - \[2022.12\] - We support a wider range of LiDAR segmentation backbones, including [RangeNet++](https://www.ipb.uni-bonn.de/wp-content/papercite-data/pdf/milioto2019iros.pdf), [SalsaNext](https://arxiv.org/abs/2003.03653), [FIDNet](https://arxiv.org/abs/2109.03787), [CENet](https://arxiv.org/abs/2207.12691), [MinkowskiUNet](https://github.com/NVIDIA/MinkowskiEngine), [Cylinder3D](https://openaccess.thecvf.com/content/CVPR2021/papers/Zhu_Cylindrical_and_Asymmetrical_3D_Convolution_Networks_for_LiDAR_Segmentation_CVPR_2021_paper.pdf), and [SPVCNN](https://arxiv.org/pdf/2007.16100), under both fully- and semi-supervised settings. The checkpoints will be available soon!
