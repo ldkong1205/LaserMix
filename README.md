@@ -21,23 +21,23 @@
   </a>
   
   <a href="https://ldkong.com/LaserMix" target='_blank'>
-    <img src="https://img.shields.io/badge/Project-%F0%9F%94%97-lightyellow">
+    <img src="https://img.shields.io/badge/Project-%F0%9F%94%97-blue">
   </a>
   
   <a href="https://ldkong.com/LaserMix" target='_blank'>
-    <img src="https://img.shields.io/badge/Poster-%F0%9F%93%83-blue">
+    <img src="https://img.shields.io/badge/Poster-%F0%9F%93%83-yellow">
   </a>
   
   <a href="https://youtu.be/Xkwa5-dT0g4" target='_blank'>
-    <img src="https://img.shields.io/badge/Demo-%F0%9F%8E%AC-lightblue">
+    <img src="https://img.shields.io/badge/Demo-%F0%9F%8E%AC-blue">
   </a>
   
   <a href="https://zhuanlan.zhihu.com/p/528689803" target='_blank'>
-    <img src="https://img.shields.io/badge/%E4%B8%AD%E8%AF%91%E7%89%88-%F0%9F%90%BC-red">
+    <img src="https://img.shields.io/badge/%E4%B8%AD%E8%AF%91%E7%89%88-%F0%9F%90%BC-yellow">
   </a>
   
   <a href="" target='_blank'>
-    <img src="https://visitor-badge.laobi.icu/badge?page_id=ldkong1205.LaserMix&left_color=gray&right_color=pink">
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=ldkong1205.LaserMix&left_color=gray&right_color=blue">
   </a>
   
 </p>
