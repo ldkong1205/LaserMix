@@ -59,8 +59,8 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
-- \[2023.03\] - Intend to test the robustness of your LiDAR segmentation models? Check our recent work, [Robo3D](https://github.com/ldkong1205/Robo3D), a comprehensive suite that enables OoD robustness evaluation of 3D segmentors on our newly established datasets: `SemanticKITTI-C`, `nuScenes-C`, and `WOD-C`.
-- \[2023.03\] - LaserMix was selected as a **highlight** at [CVPR 2023](https://cvpr.thecvf.com/) (top 10% of accepted papers).
+- \[2023.03\] - Intend to test the **robustness** of your LiDAR semantic segmentation models? Check our recent work, :robot: [Robo3D](https://github.com/ldkong1205/Robo3D), a comprehensive suite that enables OoD robustness evaluation of 3D segmentors on our newly established datasets: `SemanticKITTI-C`, `nuScenes-C`, and `WOD-C`.
+- \[2023.03\] - LaserMix was selected as a :sparkles: highlight :sparkles: at [CVPR 2023](https://cvpr.thecvf.com/) (top 10% of accepted papers).
 - \[2023.02\] - LaserMix was accepted to [CVPR 2023](https://cvpr.thecvf.com/)! :tada:
 - \[2023.02\] - LaserMix has been integrated into the [MMDetection3D](https://github.com/open-mmlab/mmdetection3d) codebase! Check [this](https://github.com/open-mmlab/mmdetection3d/pull/2302) PR in the `dev-1.x` branch to know more details. :beers:
 - \[2023.01\] - As suggested, we will establish a *sequential track* taking into account the LiDAR data collection nature in our semi-supervised LiDAR semantic segmentation benchmark. The results will be gradually updated in [RESULT.md](docs/RESULT.md).
