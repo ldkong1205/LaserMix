@@ -236,7 +236,8 @@ If you find this work helpful, please kindly consider citing our paper:
 @inproceedings{kong2023lasermix,
   title = {LaserMix for Semi-Supervised LiDAR Semantic Segmentation},
   author = {Kong, Lingdong and Ren, Jiawei and Pan, Liang and Liu, Ziwei},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages = {21705--21715},
   year = {2023},
 }
 ```
