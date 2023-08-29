@@ -1,0 +1,42 @@
+Collections:
+  - Name: Cylinder3D
+    Metadata:
+      Training Techniques:
+        - AdamW
+      Training Resources: 4x A100 GPUs
+      Architecture:
+        - Cylinder3D
+    Paper:
+      URL: https://arxiv.org/abs/2011.10033
+      Title: 'Cylindrical and Asymmetrical 3D Convolution Networks for LiDAR Segmentation'
+    README: configs/cylinder3d/README.md
+    Code:
+      URL: https://github.com/open-mmlab/mmdetection3d/blob/dev-1.x/mmdet3d/models/segmentors/cylinder3d.py#L13
+      Version: v1.1.0
+
+Models:
+  - Name: cylinder3d_4xb4-3x_semantickitti
+    In Collection: Cylinder3D
+    Config: configs/cylinder3d/cylinder3d_4xb4_3x_semantickitti.py
+    Metadata:
+      Training Data: SemanticKITTI
+      Training Memory (GB): 10.2
+    Results:
+      - Task: 3D Semantic Segmentation
+        Dataset: SemanticKITTI
+        Metrics:
+          mIoU: 63.1
+    Weights: https://download.openmmlab.com/mmdetection3d/v1.1.0_models/cylinder3d/cylinder3d_4xb4_3x_semantickitti/cylinder3d_4xb4_3x_semantickitti_20230318_191107-822a8c31.pth
+
+  - Name: cylinder3d_8xb2-laser-polar-mix-3x_semantickitti
+    In Collection: Cylinder3D
+    Config: configs/cylinder3d/cylinder3d_8xb2-laser-polar-mix-3x_semantickitti.py
+    Metadata:
+      Training Data: SemanticKITTI
+      Training Memory (GB): 12.8
+    Results:
+      - Task: 3D Semantic Segmentation
+        Dataset: SemanticKITTI
+        Metrics:
+          mIoU: 67.0
+    Weights: https://download.openmmlab.com/mmdetection3d/v1.1.0_models/cylinder3d/cylinder3d_4xb4_3x_semantickitti/cylinder3d_4xb4_3x_semantickitti_20230318_191107-822a8c31.pth

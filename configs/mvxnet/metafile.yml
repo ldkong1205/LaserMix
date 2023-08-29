@@ -1,0 +1,31 @@
+Collections:
+  - Name: MVX-Net
+    Metadata:
+      Training Data: KITTI
+      Training Techniques:
+        - AdamW
+      Training Resources: 8x V100 GPUs
+      Architecture:
+        - Feature Pyramid Network
+        - Dynamic Voxelization
+    Paper:
+      URL: https://arxiv.org/abs/1904.01649
+      Title: 'MVX-Net: Multimodal VoxelNet for 3D Object Detection'
+    README: configs/mvxnet/README.md
+    Code:
+      URL: https://github.com/open-mmlab/mmdetection3d/blob/master/mmdet3d/models/detectors/mvx_two_stage.py#L20
+      Version: v0.5.0
+
+Models:
+  - Name: dv_mvx-fpn_second_secfpn_adamw_2x8_80e_kitti-3d-3class
+    Alias: mvxnet_kitti-3class
+    In Collection: MVX-Net
+    Config: configs/mvxnet/mvxnet_fpn_dv_second_secfpn_8xb2-80e_kitti-3d-3class.py
+    Metadata:
+      Training Memory (GB): 6.7
+    Results:
+      - Task: 3D Object Detection
+        Dataset: KITTI
+        Metrics:
+          mAP: 63.5
+    Weights: https://download.openmmlab.com/mmdetection3d/v1.1.0_models/mvxnet/mvxnet_fpn_dv_second_secfpn_8xb2-80e_kitti-3d-3class/mvxnet_fpn_dv_second_secfpn_8xb2-80e_kitti-3d-3class-8963258a.pth
