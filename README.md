@@ -236,7 +236,8 @@ If you find this work helpful, please kindly consider citing our paper:
 @inproceedings{kong2023lasermix,
   title = {LaserMix for Semi-Supervised LiDAR Semantic Segmentation},
   author = {Kong, Lingdong and Ren, Jiawei and Pan, Liang and Liu, Ziwei},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages = {21705--21715},
   year = {2023},
 }
 ```
@@ -249,6 +250,11 @@ This work is under the <a rel="license" href="http://creativecommons.org/license
 
 
 ## Acknowledgement
+This work is developed based on the [MMDetection3D](https://github.com/open-mmlab/mmdetection3d) codebase.
+
+><img src="https://github.com/open-mmlab/mmdetection3d/blob/main/resources/mmdet3d-logo.png" width="30%"/><br>
+> MMDetection3D is an open-source toolbox based on PyTorch, towards the next-generation platform for general 3D perception. It is a part of the OpenMMLab project developed by MMLab.
+
 We acknowledge the use of the following public resources during the course of this work: <sup>1</sup>[nuScenes](https://www.nuscenes.org), <sup>2</sup>[nuScenes-devkit](https://github.com/nutonomy/nuscenes-devkit), <sup>3</sup>[SemanticKITTI](http://www.semantic-kitti.org/), <sup>4</sup>[SemanticKITTI-API](https://github.com/PRBonn/semantic-kitti-api), <sup>5</sup>[ScribbleKITTI](https://github.com/ouenal/scribblekitti), <sup>6</sup>[FIDNet](https://github.com/placeforyiming/IROS21-FIDNet-SemanticKITTI), <sup>7</sup>[CENet](https://github.com/huixiancheng/CENet), <sup>8</sup>[SPVNAS](https://github.com/mit-han-lab/spvnas), <sup>9</sup>[Cylinder3D](https://github.com/xinge008/Cylinder3D), <sup>10</sup>[TorchSemiSeg](https://github.com/charlesCXK/TorchSemiSeg), <sup>11</sup>[MixUp](https://github.com/facebookresearch/mixup-cifar10), <sup>12</sup>[CutMix](https://github.com/clovaai/CutMix-PyTorch), <sup>13</sup>[CutMix-Seg](https://github.com/Britefury/cutmix-semisup-seg), <sup>14</sup>[CBST](https://github.com/yzou2/CBST), <sup>15</sup>[MeanTeacher](https://github.com/CuriousAI/mean-teacher), and <sup>16</sup>[Cityscapes](https://www.cityscapes-dataset.com).
 
 We would like to thank <a href="https://hongfz16.github.io/" target='_blank'>Fangzhou Hong</a> for the insightful discussions and feedback. ❤️
