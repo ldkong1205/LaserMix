@@ -103,10 +103,10 @@ model = dict(
 
 # quota
 labeled_dataset = dict(
-    ann_file='semantickitti_infos_train.10.pkl'
+    ann_file='semantickitti_infos_train.50.pkl'
 )
 unlabeled_dataset = dict(
-    ann_file='semantickitti_infos_train.10-unlabeled.pkl',
+    ann_file='semantickitti_infos_train.50-unlabeled.pkl',
 )
 train_dataloader = dict(
     batch_size=4,
