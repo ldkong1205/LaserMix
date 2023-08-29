@@ -103,14 +103,19 @@ model = dict(
 
 # quota
 labeled_dataset = dict(
-    _delete_=True,
-    type=dataset_type, data_root=data_root, pipeline=sup_pipeline, metainfo=metainfo, modality=input_modality, ignore_index=19, backend_args=backend_args,
-    ann_file='semantickitti_infos_train.10.pkl',
+    ann_file='semantickitti_infos_train.10.pkl'
 )
 unlabeled_dataset = dict(
-    _delete_=True, 
-    type=dataset_type, data_root=data_root, pipeline=unsup_pipeline, metainfo=metainfo, modality=input_modality, ignore_index=19, backend_args=backend_args,
     ann_file='semantickitti_infos_train.10-unlabeled.pkl',
+)
+train_dataloader = dict(
+    batch_size=4,
+    num_workers=4,
+    persistent_workers=True,
+    sampler=dict(
+        type='mmdet.MultiSourceSampler', batch_size=4, source_ratio=[1, 1]),
+    dataset=dict(
+        type='ConcatDataset', datasets=[labeled_dataset, unlabeled_dataset])
 )
 
 # learning rate
