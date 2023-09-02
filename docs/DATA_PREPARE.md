@@ -56,6 +56,9 @@ To install the [SemanticKITTI](http://semantic-kitti.org/index) dataset, downloa
         └── semantic-kitti.yaml
 ```
 
+:memo: Download the pre-processed `.pkl` files from [here](https://drive.google.com/drive/folders/1PInw2Wvt-vgNzOxlSd2EiDANrTsWV7w1) and put them under the `semantickitti/` folder.
+
+
 ### ScribbleKITTI
 
 To install the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, download the annotations from https://data.vision.ee.ethz.ch/ouenal/scribblekitti.zip. Note that you only need to download these annotation files (~118.2MB); the data is the same as [SemanticKITTI](http://semantic-kitti.org/index). Unpack the compressed file(s) into `/data/sets/scribblekitti` and re-organize the data structure. Your folder structure should end up looking like this:
