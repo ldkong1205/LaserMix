@@ -4,8 +4,7 @@ _base_ = [
 ]
 
 dataset_type = 'SemanticKittiDataset'
-# data_root = 'data/semantickitti/'
-data_root = '/mnt/petrelfs/share_data/liuyouquan/semantickitti'
+data_root = 'data/semantickitti/'
 
 class_names = [
     'car', 'bicycle', 'motorcycle', 'truck', 'bus', 'person', 'bicyclist',
