@@ -34,7 +34,7 @@ conda activate lasermix
 
 ### Step 3: Install PyTorch
 ```Shell
-conda install pytorch==1.11.0 torchvision==0.12.0 cudatoolkit=11.3 -c pytorch
+conda install pytorch==1.10.0 torchvision==0.11.0 cudatoolkit=11.3 -c pytorch
 ```
 
 ### Step 4: Install MMDetection3D
