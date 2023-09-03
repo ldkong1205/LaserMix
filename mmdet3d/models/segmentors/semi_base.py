@@ -35,15 +35,16 @@ class SemiBase3DSegmentor(Base3DSegmentor):
     """
 
     def __init__(self,
-                 segmentor: ConfigType,
+                 segmentor_student: ConfigType,
+                 segmentor_teacher: ConfigType,
                  semi_train_cfg: OptConfigType = None,
                  semi_test_cfg: OptConfigType = None,
                  data_preprocessor: OptConfigType = None,
                  init_cfg: OptMultiConfig = None) -> None:
         super(SemiBase3DSegmentor, self).__init__(
             data_preprocessor=data_preprocessor, init_cfg=init_cfg)
-        self.student = MODELS.build(segmentor)
-        self.teacher = MODELS.build(segmentor)
+        self.student = MODELS.build(segmentor_student)
+        self.teacher = MODELS.build(segmentor_teacher)
         self.semi_train_cfg = semi_train_cfg
         self.semi_test_cfg = semi_test_cfg
         if self.semi_train_cfg.get('freeze_teacher', True) is True:
@@ -142,6 +143,10 @@ class SemiBase3DSegmentor(Base3DSegmentor):
                 {'gt_pts_seg': PointData(**{'pts_semantic_mask': seg_labels})})
         return logits, batch_data_samples
 
+    def _update_ema_variables(self, momentum):
+        for param_t, param_s in zip(self.teacher.parameters(), self.student.parameters()):
+            param_t.data.mul_(1 - momentum).add_(param_s.data, alpha=momentum)
+
     def predict(self, batch_inputs: dict,
                 batch_data_samples: SampleList) -> SampleList:
         """Predict results from a batch of inputs and data samples with post-
@@ -178,10 +183,7 @@ class SemiBase3DSegmentor(Base3DSegmentor):
                       batch_data_samples: SampleList) -> Tensor:
         """Placeholder for encode images with backbone and decode into a
         semantic segmentation map of the same size as input."""
-        if self.semi_test_cfg.get('extract_feat_on', 'teacher') == 'teacher':
-            return self.teacher.encode_decode(batch_inputs, batch_data_samples)
-        else:
-            return self.student.encode_decode(batch_inputs, batch_data_samples)
+        pass
 
     def _load_from_state_dict(self, state_dict: OrderedDict, prefix: str,
                               local_metadata: dict, strict: bool,
