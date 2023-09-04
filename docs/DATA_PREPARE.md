@@ -15,7 +15,7 @@
 
 ### nuScenes
 
-To install the [nuScenes-lidarseg](https://www.nuscenes.org/nuscenes) dataset, download the data, annotations, and other files from https://www.nuscenes.org/download. Unpack the compressed file(s) into `/data/sets/nuscenes` and your folder structure should end up looking like this:
+To prepare the [nuScenes-lidarseg](https://www.nuscenes.org/nuscenes) dataset, download the data, annotations, and other files from https://www.nuscenes.org/download. Unpack the compressed file(s) into `/data/sets/nuscenes` and your folder structure should end up looking like this:
 
 ```
 └── nuscenes  
@@ -34,9 +34,11 @@ To install the [nuScenes-lidarseg](https://www.nuscenes.org/nuscenes) dataset, d
                               category.json from nuScenes v1.0 is overwritten)
 ```
 
+<hr>
+
 ### SemanticKITTI
 
-To install the [SemanticKITTI](http://semantic-kitti.org/index) dataset, download the data, annotations, and other files from http://semantic-kitti.org/dataset. Unpack the compressed file(s) into `/data/sets/semantickitti` and re-organize the data structure. Your folder structure should end up looking like this:
+To prepare the [SemanticKITTI](http://semantic-kitti.org/index) dataset, download the data, annotations, and other files from http://semantic-kitti.org/dataset. Unpack the compressed file(s) into `/data/sets/semantickitti` and re-organize the data structure. Your folder structure should end up looking like this:
 
 ```
 └── semantickitti  
@@ -56,12 +58,29 @@ To install the [SemanticKITTI](http://semantic-kitti.org/index) dataset, downloa
         └── semantic-kitti.yaml
 ```
 
-:memo: Download the pre-processed `.pkl` files from [here](https://drive.google.com/drive/folders/1PInw2Wvt-vgNzOxlSd2EiDANrTsWV7w1) and put them under the `semantickitti/` folder.
-
+#### :memo: Create SemanticKITTI Dataset
+- For fully-supervised training and evaluation:
+  - We support scripts that generate dataset information for training and validation. Create these `.pkl` info files by running:
+    ```Shell
+    python ./tools/create_data.py semantickitti --root-path ./data/semantickitti --out-dir ./data/semantickitti --extra-tag semantickitti
+    ```
+- For semi-supervised training and evaluation:
+  - Download the pre-processed `.pkl` files from [here](https://drive.google.com/drive/folders/1PInw2Wvt-vgNzOxlSd2EiDANrTsWV7w1) and put them under the `semantickitti/` folder.
+    ```
+    └── semantickitti
+        ├── sequences
+        ├── semantickitti_infos_train.pkl
+        ├── semantickitti_infos_val.pkl
+        ├── ...
+        ├── semantickitti_infos_train.10.pkl
+        ├── semantickitti_infos_train.10-unlabeled.pkl
+        └── ...
+    ```
+<hr>
 
 ### ScribbleKITTI
 
-To install the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, download the annotations from https://data.vision.ee.ethz.ch/ouenal/scribblekitti.zip. Note that you only need to download these annotation files (~118.2MB); the data is the same as [SemanticKITTI](http://semantic-kitti.org/index). Unpack the compressed file(s) into `/data/sets/scribblekitti` and re-organize the data structure. Your folder structure should end up looking like this:
+To prepare the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, download the annotations from https://data.vision.ee.ethz.ch/ouenal/scribblekitti.zip. Note that you only need to download these annotation files (~118.2MB); the data is the same as [SemanticKITTI](http://semantic-kitti.org/index). Unpack the compressed file(s) into `/data/sets/scribblekitti` and re-organize the data structure. Your folder structure should end up looking like this:
 
 
 ```
@@ -73,9 +92,13 @@ To install the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, downlo
              └── 10
 ```
 
+<hr>
+
 ### Waymo Open
 
 Coming soon.
+
+<hr>
 
 ### References
 
