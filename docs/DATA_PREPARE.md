@@ -7,9 +7,9 @@
 ```
 └── data 
     └── sets
-        └── nuscenes
-        └── semantickitti
-        └── scribblekitti
+        │── nuscenes
+        │── semantickitti
+        │── scribblekitti
         └── waymo_open
 ```
 
@@ -44,16 +44,16 @@ To prepare the [SemanticKITTI](http://semantic-kitti.org/index) dataset, downloa
 └── semantickitti  
     └── sequences
         ├── velodyne <- contains the .bin files; a .bin file contains the points in a point cloud
-        │    └── 00
-        │    └── ···
+        │    │── 00
+        │    │── ···
         │    └── 21
         ├── labels   <- contains the .label files; a .label file contains the labels of the points in a point cloud
-        │    └── 00
-        │    └── ···
+        │    │── 00
+        │    │── ···
         │    └── 10
         ├── calib
-        │    └── 00
-        │    └── ···
+        │    │── 00
+        │    │── ···
         │    └── 21
         └── semantic-kitti.yaml
 ```
@@ -86,8 +86,8 @@ To prepare the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, downlo
 └── scribblekitti 
     └── sequences
         └── scribbles <- contains the .label files; a .label file contains the scribble labels of the points in a point cloud
-             └── 00
-             └── ···
+             │── 00
+             │── ···
              └── 10
 ```
 
