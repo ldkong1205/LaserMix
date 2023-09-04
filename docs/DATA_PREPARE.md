@@ -82,7 +82,6 @@ To prepare the [SemanticKITTI](http://semantic-kitti.org/index) dataset, downloa
 
 To prepare the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, download the annotations from https://data.vision.ee.ethz.ch/ouenal/scribblekitti.zip. Note that you only need to download these annotation files (~118.2MB); the data is the same as [SemanticKITTI](http://semantic-kitti.org/index). Unpack the compressed file(s) into `/data/sets/scribblekitti` and re-organize the data structure. Your folder structure should end up looking like this:
 
-
 ```
 └── scribblekitti 
     └── sequences
@@ -91,6 +90,9 @@ To prepare the [ScribbleKITTI](https://arxiv.org/abs/2203.08537) dataset, downlo
              └── ···
              └── 10
 ```
+
+#### :memo: Create ScribbleKITTI Dataset
+Since [ScribbleKITTI](https://arxiv.org/abs/2203.08537) shares the same training data with [SemanticKITTI](http://semantic-kitti.org/index), you can follow the same [procedure](#semantickitti) above.
 
 <hr>
 
