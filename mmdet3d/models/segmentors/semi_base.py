@@ -143,6 +143,24 @@ class SemiBase3DSegmentor(Base3DSegmentor):
                 {'gt_pts_seg': PointData(**{'pts_semantic_mask': seg_labels})})
         return logits, batch_data_samples
 
+    @torch.no_grad()
+    def get_pseudo_instances_range_view(
+            self, batch_inputs: Tensor,
+            batch_data_samples: SampleList) -> Tuple[Tensor, SampleList]:
+        """Get pseudo instances from teacher model."""
+        logits = self.teacher(batch_inputs, batch_data_samples, mode='tensor')
+        # results_list = self.teacher.decode_head.predict_by_feat(
+        #     logits, batch_data_samples)
+        for data_samples, logit in zip(batch_data_samples, logits):
+            seg_logit = F.softmax(logit, dim=1)
+            seg_score, seg_label = seg_logit.max(dim=1)  # [h, w]
+            pseudo_thr = self.semi_train_cfg.get('pseudo_thr', 0.)
+            ignore_mask = (seg_score < pseudo_thr)
+            seg_label[ignore_mask] = self.semi_train_cfg.ignore_label
+            data_samples.set_data(
+                {'gt_pts_seg': PointData(**{'semantic_seg': torch.unsqueeze(seg_label, dim=0)})})
+        return logits, batch_data_samples
+
     def _update_ema_variables(self, momentum):
         for param_t, param_s in zip(self.teacher.parameters(), self.student.parameters()):
             param_t.data.mul_(1 - momentum).add_(param_s.data, alpha=momentum)
