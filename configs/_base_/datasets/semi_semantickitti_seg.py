@@ -3,7 +3,7 @@
 # i.e. we consider the unlabeled class as the last one, which is different
 # from the original implementation of some methods e.g. Cylinder3D.
 dataset_type = 'SemanticKittiDataset'
-data_root = '/root/autodl-tmp/data/sets/semantickitti'
+data_root = '/data/sets/semantickitti/'
 class_names = [
     'car', 'bicycle', 'motorcycle', 'truck', 'bus', 'person', 'bicyclist',
     'motorcyclist', 'road', 'parking', 'sidewalk', 'other-ground', 'building',
