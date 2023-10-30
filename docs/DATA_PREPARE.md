@@ -34,6 +34,26 @@ To prepare the [nuScenes-lidarseg](https://www.nuscenes.org/nuscenes) dataset, d
                               category.json from nuScenes v1.0 is overwritten)
 ```
 
+#### :memo: Create nuScenes Dataset
+- For fully-supervised training and evaluation:
+  - We support scripts that generate dataset information for training and validation. Create these `.pkl` info files by running:
+    ```Shell
+    python ./tools/create_data.py nuscenes --root-path ./data/nuscenes --out-dir ./data/nuscenes --extra-tag nuscenes
+    ```
+- For semi-supervised training and evaluation:
+  - Download the pre-processed `.pkl` files from [here](https://drive.google.com/drive/folders/1jR393_qadV6jjTCPBOgqLiJOYwVl92HG?usp=sharing) and put them under the `nuscenes/` folder.
+    ```
+    └── nuscenes
+        ├── Usual nuscenes folders (i.e. samples, sweep)
+        ├── ...   
+        ├── nuscenes_infos_train.pkl
+        ├── nuscenes_infos_val.pkl
+        ├── ...
+        ├── nuscenes_infos_train.10.pkl
+        ├── nuscenes_infos_train.10-unlabeled.pkl
+        └── ...
+    ```
+
 <hr>
 
 ### SemanticKITTI
