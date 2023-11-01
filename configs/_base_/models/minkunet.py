@@ -26,6 +26,7 @@ model = dict(
         type='MinkUNetHead',
         channels=96,
         num_classes=19,
+        batch_first=False,
         dropout_ratio=0,
         loss_decode=dict(type='mmdet.CrossEntropyLoss', avg_non_ignore=True),
         ignore_index=19),
