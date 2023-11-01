@@ -1,4 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+from typing import Dict
+
 from torch import Tensor
 
 from mmdet3d.registry import MODELS
@@ -19,10 +21,10 @@ class MinkUNet(EncoderDecoder3D):
     """
 
     def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
+        super(MinkUNet).__init__(**kwargs)
 
-    def loss(self, inputs: dict, data_samples: SampleList):
-        """Calculate losses from a batch of inputs and data samples.
+    def extract_feat(self, batch_inputs_dict: dict) -> dict:
+        """Extract features from voxels.
 
         Args:
             batch_inputs_dict (dict): Input sample dict which
@@ -30,30 +32,66 @@ class MinkUNet(EncoderDecoder3D):
 
                 - points (List[Tensor]): Point cloud of each sample.
                 - voxels (dict): Voxel feature and coords after voxelization.
-            batch_data_samples (List[:obj:`Det3DDataSample`]): The seg data
+
+        Returns:
+            dict: The dict containing features.
+        """
+        voxel_dict = batch_inputs_dict['voxels'].copy()
+        x = self.backbone(voxel_dict['voxels'], voxel_dict['coors'])
+        if self.with_neck:
+            x = self.neck(x)
+        voxel_dict['voxel_feats'] = x
+        return voxel_dict
+
+    def loss(self, batch_inputs_dict: dict,
+             batch_data_samples: SampleList) -> Dict[str, Tensor]:
+        """Calculate losses from a batch of inputs and data samples.
+
+        Args:
+            batch_inputs_dict (dict): Input sample dict which
+                includes 'points' and 'imgs' keys.
+
+                - points (List[Tensor]): Point cloud of each sample.
+                - imgs (Tensor, optional): Image tensor has shape (B, C, H, W).
+            batch_data_samples (List[:obj:`Det3DDataSample`]): The det3d data
                 samples. It usually includes information such as `metainfo` and
                 `gt_pts_seg`.
 
         Returns:
             Dict[str, Tensor]: A dictionary of loss components.
         """
-        x = self.extract_feat(inputs)
-        losses = self.decode_head.loss(x, data_samples, self.train_cfg)
+        # extract features using backbone
+        voxel_dict = self.extract_feat(batch_inputs_dict)
+        losses = dict()
+        loss_decode = self._decode_head_forward_train(voxel_dict,
+                                                      batch_data_samples)
+        losses.update(loss_decode)
+
+        if self.with_auxiliary_head:
+            loss_aux = self._auxiliary_head_forward_train(
+                voxel_dict, batch_data_samples)
+            losses.update(loss_aux)
+
         return losses
 
-    def predict(self, inputs: dict,
-                batch_data_samples: SampleList) -> SampleList:
+    def predict(self,
+                batch_inputs_dict: dict,
+                batch_data_samples: SampleList,
+                rescale: bool = True) -> SampleList:
         """Simple test with single scene.
 
         Args:
-            batch_inputs_dict (dict): Input sample dict which
-                includes 'points' and 'voxels' keys.
+            batch_inputs_dict (dict): Input sample dict which includes 'points'
+                and 'imgs' keys.
 
                 - points (List[Tensor]): Point cloud of each sample.
-                - voxels (dict): Voxel feature and coords after voxelization.
-            batch_data_samples (List[:obj:`Det3DDataSample`]): The seg data
+                - imgs (Tensor, optional): Image tensor has shape (B, C, H, W).
+            batch_data_samples (List[:obj:`Det3DDataSample`]): The det3d data
                 samples. It usually includes information such as `metainfo` and
                 `gt_pts_seg`.
+            rescale (bool): Whether transform to original number of points.
+                Will be used for voxelization based segmentors.
+                Defaults to True.
 
         Returns:
             List[:obj:`Det3DDataSample`]: Segmentation results of the input
@@ -64,8 +102,12 @@ class MinkUNet(EncoderDecoder3D):
             - ``pts_seg_logits`` (PointData): Predicted logits of 3D semantic
               segmentation before normalization.
         """
-        x = self.extract_feat(inputs)
-        seg_logits_list = self.decode_head.predict(x, batch_data_samples)
+        # 3D segmentation requires per-point prediction, so it's impossible
+        # to use down-sampling to get a batch of scenes with same num_points
+        # therefore, we only support testing one scene every time
+        voxel_dict = self.extract_feat(batch_inputs_dict)
+        seg_logits_list = self.decode_head.predict(voxel_dict,
+                                                   batch_data_samples)
         for i in range(len(seg_logits_list)):
             seg_logits_list[i] = seg_logits_list[i].transpose(0, 1)
 
@@ -77,36 +119,17 @@ class MinkUNet(EncoderDecoder3D):
         """Network forward process.
 
         Args:
-            batch_inputs_dict (dict): Input sample dict which
-                includes 'points' and 'voxels' keys.
+            batch_inputs_dict (dict): Input sample dict which includes 'points'
+                and 'imgs' keys.
 
                 - points (List[Tensor]): Point cloud of each sample.
-                - voxels (dict): Voxel feature and coords after voxelization.
-            batch_data_samples (List[:obj:`Det3DDataSample`]): The seg data
+                - imgs (Tensor, optional): Image tensor has shape (B, C, H, W).
+            batch_data_samples (List[:obj:`Det3DDataSample`]): The det3d data
                 samples. It usually includes information such as `metainfo` and
-                `gt_pts_seg`. Defaults to None.
+                `gt_pts_seg`.
 
         Returns:
             Tensor: Forward output of model without any post-processes.
         """
-        x = self.extract_feat(batch_inputs_dict)
-        return self.decode_head.forward(x)
-
-    def extract_feat(self, batch_inputs_dict: dict) -> Tensor:
-        """Extract features from voxels.
-
-        Args:
-            batch_inputs_dict (dict): Input sample dict which
-                includes 'points' and 'voxels' keys.
-
-                - points (List[Tensor]): Point cloud of each sample.
-                - voxels (dict): Voxel feature and coords after voxelization.
-
-        Returns:
-            SparseTensor: voxels with features.
-        """
-        voxel_dict = batch_inputs_dict['voxels']
-        x = self.backbone(voxel_dict['voxels'], voxel_dict['coors'])
-        if self.with_neck:
-            x = self.neck(x)
-        return x
+        voxel_dict = self.extract_feat(batch_inputs_dict)
+        return self.decode_head.forward(voxel_dict)
