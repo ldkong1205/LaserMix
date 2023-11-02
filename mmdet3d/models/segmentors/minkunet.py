@@ -21,7 +21,7 @@ class MinkUNet(EncoderDecoder3D):
     """
 
     def __init__(self, **kwargs) -> None:
-        super(MinkUNet).__init__(**kwargs)
+        super(MinkUNet, self).__init__(**kwargs)
 
     def extract_feat(self, batch_inputs_dict: dict) -> dict:
         """Extract features from voxels.
