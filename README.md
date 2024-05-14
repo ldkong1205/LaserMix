@@ -59,6 +59,7 @@ Visit our <a href="https://ldkong.com/LaserMix" target='_blank'>project page</a>
 
 ## Updates
 
+- \[2024.05\] - Our improved framework, [LaserMix++](https://arxiv.org/abs/2405.05258) :rocket:, is avaliable on arXiv.
 - \[2024.01\] - The [toolkit](https://github.com/robodrive-24/toolkit) tailored for [The RoboDrive Challenge](https://robodrive-24.github.io/) has been released. :hammer_and_wrench:
 - \[2023.12\] - We are hosting [The RoboDrive Challenge](https://robodrive-24.github.io/) at [ICRA 2024](https://2024.ieee-icra.org/). :blue_car:
 - \[2023.12\] - Introducing [FRNet](https://github.com/Xiangxu-0103/FRNet), an efficient and effective **real-time** LiDAR segmentation model that achieves promising semi-supervised learning results on `SemanticKITTI` and `nuScenes`. Code and checkpoints are available for downloading.
